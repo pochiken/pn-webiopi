@@ -45,6 +45,7 @@ RPI_INFO()を追加しています。
 RPI_INFO()を利用することで実行中のRaspberry Piの情報を取得することが可能です。
 webiopi.GPIO.RPI_INFOを実行することでJSON形式のデータが取得できます。
 取得できる情報は以下の通りです（以下はRaspberry Pi A+にて実行したときの情報です）
+
 {'P1_REVISION': 3, 'REVISION': '900021', 'TYPE': 'Model A+', 'MANUFACTURER': 'Sony UK', 'PROCESSOR': 'BCM2835', 'RAM': '512M'}
 
 
