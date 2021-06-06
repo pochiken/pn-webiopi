@@ -40,6 +40,7 @@ $ sudo ./setup.sh
 
 
 pythonモジュールwebiopiについて
+
 RPI_INFO()を追加しています。
 RPI_INFO()を利用することで実行中のRaspberry Piの情報を取得することが可能です。
 webiopi.GPIO.RPI_INFOを実行することでJSON形式のデータが取得できます。
