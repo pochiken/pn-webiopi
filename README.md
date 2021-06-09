@@ -49,4 +49,5 @@ webiopi.GPIO.RPI_INFOを実行することでJSON形式のデータが取得で�
 {'P1_REVISION': 3, 'REVISION': '900021', 'TYPE': 'Model A+', 'MANUFACTURER': 'Sony UK', 'PROCESSOR': 'BCM2835', 'RAM': '512M'}
 
 
+![webiopi](https://user-images.githubusercontent.com/24805847/121349278-49fa8700-c964-11eb-971c-88f845703fb5.png)
 
