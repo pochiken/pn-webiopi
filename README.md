@@ -19,17 +19,17 @@ $ wget http://sourceforge.net/projects/webiopi/files/WebIOPi-0.7.1.tar.gz
 
 $ tar xvzf WebIOPi-0.7.1.tar.gz
 
+パッチをダウンロードします。
+
+$ git clone https://github.com/pochiken/pn-webiopi.git
+
 WebIOPiのディレクトリに移動します。
 
 $ cd WebIOPi-0.7.1
 
-パッチをダウンロードします。
-
-$ wget https://github.com/pochiken/pn-webiopi/blob/main/WebIOPi-RPiALL.patch
-
 パッチを実行します。
 
-$ patch -p1 -i WebIOPi-RPiALL.patch
+$ patch -p1 < ../pn-webiopi/WebIOPi-RPiALL.patch
 
 セットアップを実行します
 
