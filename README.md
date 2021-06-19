@@ -11,22 +11,22 @@ WebIOPiのオリジナルは既に開発が停止しているため、最新のR
 【手順】
 ラズベリーパイにWebIOPiをインストールする
 
-* WebIOPiをダウンロードします。
+* WebIOPiをダウンロードします。  
 `$ wget http://sourceforge.net/projects/webiopi/files/WebIOPi-0.7.1.tar.gz`
 
-* 解凍します。
+* 解凍します。  
 `$ tar xvzf WebIOPi-0.7.1.tar.gz`
 
-* パッチをダウンロードします。
+* パッチをダウンロードします。  
 `$ git clone https://github.com/pochiken/pn-webiopi.git`
 
-* WebIOPiのディレクトリに移動します。
+* WebIOPiのディレクトリに移動します。  
 `$ cd WebIOPi-0.7.1`
 
-* パッチを実行します。
+* パッチを実行します。  
 `$ patch -p1 < ../pn-webiopi/WebIOPi-RPiALL.patch`
 
-* セットアップを実行します
+* セットアップを実行します。  
 `$ sudo ./setup.sh`
 
 「Do you want to access WebIOPi over Internet ? [y/n]」が表示されたら「n」を入力してから「Enter」キーを押します。 
