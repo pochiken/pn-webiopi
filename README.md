@@ -44,7 +44,7 @@ webiopi.GPIO.RPI_INFOを実行することでJSON形式のデータが取得で�
 
 # REST APIについて
 ## rpi_infoで情報を取得できます。
-`GET /rpi_info`
+`GET /rpi_info`  
 {"P1_REVISION": 3, "REVISION": "a020d3", "TYPE": "Raspberry Pi 3 Model B+", "MANUFACTURER": "Sony UK", "PROCESSOR": "BCM2837", "RAM": "1G"}
 
 ![webiopi_menu](https://user-images.githubusercontent.com/24805847/121764068-f82c4980-cb7b-11eb-8d02-b995199b45ce.png)
