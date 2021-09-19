@@ -48,7 +48,7 @@ webiopi.GPIO.RPI_INFOを実行することでJSON形式のデータが取得で�
 {"P1_REVISION": 3, "REVISION": "a020d3", "TYPE": "Raspberry Pi 3 Model B+", "MANUFACTURER": "Sony UK", "PROCESSOR": "BCM2837", "RAM": "1G"}
 
 # WebIOPi Main Menuに実行中のラズパイ情報が表示されます  
-![webiopi_menu](https://user-images.githubusercontent.com/24805847/121764068-f82c4980-cb7b-11eb-8d02-b995199b45ce.png)
+![RPi400_Webiopi](https://user-images.githubusercontent.com/24805847/133913690-328702ca-47f3-4fe4-a5bd-a3a6745290a3.png)
 # I2C/SPI/UART/1wireなど設定することで表示変わります（UART/1wireは再起動が必要）  
 ![webiopi](https://user-images.githubusercontent.com/24805847/121349278-49fa8700-c964-11eb-971c-88f845703fb5.png)
 
