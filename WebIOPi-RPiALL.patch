@@ -3187,7 +3187,7 @@ diff -urN WebIOPi-0.7.1/python/native/bridge.c WebIOPi-0.7.1a/python/native/brid
  	{
 diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpuinfo.c
 --- WebIOPi-0.7.1/python/native/cpuinfo.c	2012-10-29 06:26:10.000000000 +0900
-+++ WebIOPi-0.7.1a/python/native/cpuinfo.c	2021-06-23 00:12:01.586499591 +0900
++++ WebIOPi-0.7.1a/python/native/cpuinfo.c	2021-11-06 23:25:13.535440558 +0900
 @@ -1,5 +1,5 @@
  /*
 -Copyright (c) 2012 Ben Croston
@@ -3195,7 +3195,7 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
  this software and associated documentation files (the "Software"), to deal in
-@@ -20,46 +20,253 @@
+@@ -20,46 +20,266 @@
  SOFTWARE.
  */
  
@@ -3298,14 +3298,15 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +               case '9': info->type = "Raspberry Pi Zero"; info->p1_revision = 3; break;
 +               case 'a': info->type = "Compute Module 3"; info->p1_revision = 0; break;
 +               case 'c': info->type = "Raspberry Pi Zero W"; info->p1_revision = 3; break;
-+               case 'd': info->type = "Raspberry Pi 3 Model B+"; info->p1_revision = 3; break;
-+               case 'e': info->type = "Raspberry Pi 3 Model A+"; info->p1_revision = 3; break;
++               case 'd': info->type = "Raspberry Pi 3 Model B+"; info->p1_revision = 4; break;
++               case 'e': info->type = "Raspberry Pi 3 Model A+"; info->p1_revision = 4; break;
 +               default : info->type = "Unknown"; info->p1_revision = 3; break;
 +            } break;
 +         case '1':
 +            switch (revision[len-2]) {
 +               case '0': info->type = "Compute Module 3+"; info->p1_revision = 0; break;
 +               case '1': info->type = "Raspberry Pi 4 Model B"; info->p1_revision = 3; break;
++               case '2': info->type = "Raspberry Pi Zero 2 W"; info->p1_revision = 4; break;
 +               case '3': info->type = "Raspberry Pi 400"; info->p1_revision = 3; break;
 +               case '4': info->type = "Compute Mudule 4"; info->p1_revision = 0; break;
 +               default : info->type = "Unknown"; info->p1_revision = 3; break;
@@ -3316,8 +3317,20 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +      switch (revision[len-4]) {
 +         case '0': info->processor = "BCM2835"; break;
 +         case '1': info->processor = "BCM2836"; break;
-+         case '2': info->processor = "BCM2837"; break;
-+         case '3': info->processor = "BCM2711"; break;
++         case '2': 
++               switch (revision[len-3]) {
++                     case '1': info->processor = "RP3A0"; break;
++                     default : 
++                           switch (info->p1_revision) {
++                                 case '4': info->processor = "BCM2837B0"; break;
++                                 default : info->processor = "BCM2837"; break;
++                                 } break;
++               } break;
++         case '3': 
++               switch (info->p1_revision) {
++                     case '4': info->processor = "BCM2711C0"; break;
++                     default : info->processor = "BCM2711"; break;
++               } break;
 +         default : info->processor = "Unknown"; break;
 +      }
 +      switch (revision[len-5]) {
@@ -3470,10 +3483,10 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +SRRR MMMM PPPP TTTT TTTT VVVV
 +
 +S scheme (0=old, 1=new)
-+R RAM (0=256, 1=512, 2=1024)
-+M manufacturer (0='SONY',1='EGOMAN',2='EMBEST',3='UNKNOWN',4='EMBEST')
-+P processor (0=2835, 1=2836 2=2837)
-+T type (0='A', 1='B', 2='A+', 3='B+', 4='Pi 2 B', 5='Alpha', 6='Compute Module')
++R RAM (0=256,1=512,2=1024,3=2048,4=4096,5=8192)
++M manufacturer (0='SONY',1='EGOMAN',2='EMBEST',3='SONY JP',4='EMBEST',5='Studiam')
++P processor (0=2835,1=2836,2=2837,3=2711)
++T type (0='A',1='B',2='A+',3='B+',4='Pi 2 B',5='Alpha',6='Compute Module')
 +V revision (0-15)
 +
 +*/
