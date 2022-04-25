@@ -27,7 +27,10 @@ WebIOPiのオリジナルは既に開発が停止しているため、最新のR
 `$ patch -p1 < ../pn-webiopi/WebIOPi-RPiALL.patch`
 
 * セットアップを実行します。  
-`$ sudo ./setup.sh`
+Busterまでのバージョン  
+`$ sudo ./setup.sh`  
+Bullseye  
+`$ sudo ./setup.sh -fcommon`
 
 「Do you want to access WebIOPi over Internet ? [y/n]」が表示されたら「n」を入力してから「Enter」キーを押します。 
   
