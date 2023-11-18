@@ -1,6 +1,6 @@
-diff -urN WebIOPi-0.7.1/htdocs/index.html WebIOPi-0.7.1a/htdocs/index.html
---- WebIOPi-0.7.1/htdocs/index.html	2014-02-03 02:55:16.000000000 +0900
-+++ WebIOPi-0.7.1a/htdocs/index.html	2021-06-23 00:12:01.576499590 +0900
+diff -urN WebIOPi-0.7.1org/htdocs/index.html WebIOPi-0.7.1/htdocs/index.html
+--- WebIOPi-0.7.1org/htdocs/index.html	2014-02-03 02:55:16.000000000 +0900
++++ WebIOPi-0.7.1/htdocs/index.html	2023-11-18 16:44:01.287516360 +0900
 @@ -4,10 +4,18 @@
  	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
  	<meta name="viewport" content = "width = 420, user-scalable = no" /> 
@@ -20,9 +20,9 @@ diff -urN WebIOPi-0.7.1/htdocs/index.html WebIOPi-0.7.1a/htdocs/index.html
  
  <h2><a href="/app/gpio-header">GPIO Header</a></h2>
  <p>Control and Debug the Raspberry Pi GPIO with a display which looks like the physical header.</p>
-diff -urN WebIOPi-0.7.1/htdocs/webiopi.css WebIOPi-0.7.1a/htdocs/webiopi.css
---- WebIOPi-0.7.1/htdocs/webiopi.css	2014-02-01 05:02:27.000000000 +0900
-+++ WebIOPi-0.7.1a/htdocs/webiopi.css	2021-06-23 00:12:01.576499590 +0900
+diff -urN WebIOPi-0.7.1org/htdocs/webiopi.css WebIOPi-0.7.1/htdocs/webiopi.css
+--- WebIOPi-0.7.1org/htdocs/webiopi.css	2014-02-01 05:02:27.000000000 +0900
++++ WebIOPi-0.7.1/htdocs/webiopi.css	2023-11-18 16:44:01.291516273 +0900
 @@ -28,7 +28,7 @@
  }
  
@@ -69,10 +69,10 @@ diff -urN WebIOPi-0.7.1/htdocs/webiopi.css WebIOPi-0.7.1a/htdocs/webiopi.css
  }
  
  .FunctionBasic {
-diff -urN WebIOPi-0.7.1/htdocs/webiopi.js WebIOPi-0.7.1a/htdocs/webiopi.js
---- WebIOPi-0.7.1/htdocs/webiopi.js	2014-02-24 01:37:07.000000000 +0900
-+++ WebIOPi-0.7.1a/htdocs/webiopi.js	2021-06-23 00:13:35.916511746 +0900
-@@ -1,1518 +1,1531 @@
+diff -urN WebIOPi-0.7.1org/htdocs/webiopi.js WebIOPi-0.7.1/htdocs/webiopi.js
+--- WebIOPi-0.7.1org/htdocs/webiopi.js	2014-02-24 01:37:07.000000000 +0900
++++ WebIOPi-0.7.1/htdocs/webiopi.js	2023-11-18 14:46:09.756486264 +0900
+@@ -1,1518 +1,1533 @@
 -/*
 -   Copyright 2012-2013 Eric Ptak - trouch.com
 -
@@ -1897,10 +1897,12 @@ diff -urN WebIOPi-0.7.1/htdocs/webiopi.js WebIOPi-0.7.1a/htdocs/webiopi.js
 +WebIOPi.prototype.RPiInfo = function () {
 +	$.getJSON(w().context + "rpi_info", function(data) {
 +		var rpi_type = $('<a>MODEL : ' + data["TYPE"] + '</a><br>');
++		var rpi_brev = $('<a>REVISION : ' + data["BREV"] + '</a><br>');
 +		var rpi_proc = $('<a>PROCESSOR : ' + data["PROCESSOR"] + '</a><br>');
 +		var rpi_rams = $('<a>MEMORY : ' + data["RAM"] + '</a><br>');
 +		var rpi_fact = $('<a>MANUFACTURER : ' + data["MANUFACTURER"] + '</a>');
 +		$("#myinfo").append(rpi_type);
++		$("#myinfo").append(rpi_brev);
 +		$("#myinfo").append(rpi_proc);
 +		$("#myinfo").append(rpi_rams);
 +		$("#myinfo").append(rpi_fact);
@@ -3122,9 +3124,9 @@ diff -urN WebIOPi-0.7.1/htdocs/webiopi.js WebIOPi-0.7.1a/htdocs/webiopi.js
 +		setTimeout(function(){temp.refreshUI()}, temp.refreshTime);
 +	});
 +}
-diff -urN WebIOPi-0.7.1/python/native/bridge.c WebIOPi-0.7.1a/python/native/bridge.c
---- WebIOPi-0.7.1/python/native/bridge.c	2013-03-17 21:56:40.000000000 +0900
-+++ WebIOPi-0.7.1a/python/native/bridge.c	2021-06-23 00:12:01.586499591 +0900
+diff -urN WebIOPi-0.7.1org/python/native/bridge.c WebIOPi-0.7.1/python/native/bridge.c
+--- WebIOPi-0.7.1org/python/native/bridge.c	2013-03-17 21:56:40.000000000 +0900
++++ WebIOPi-0.7.1/python/native/bridge.c	2023-11-18 15:50:32.328196429 +0900
 @@ -28,6 +28,8 @@
  static PyObject *_InvalidDirectionException;
  static PyObject *_InvalidChannelException;
@@ -3152,7 +3154,7 @@ diff -urN WebIOPi-0.7.1/python/native/bridge.c WebIOPi-0.7.1a/python/native/brid
  
  #if PY_MAJOR_VERSION > 2
  	if ((module = PyModule_Create(&python_module)) == NULL)
-@@ -687,19 +687,26 @@
+@@ -687,19 +687,27 @@
  	PyModule_AddObject(module, "PUD_DOWN", _pud_down);
  
  	// detect board revision and set up accordingly
@@ -3169,12 +3171,13 @@ diff -urN WebIOPi-0.7.1/python/native/bridge.c WebIOPi-0.7.1a/python/native/brid
 +	return;
  #endif
  	}
-+	board_info = Py_BuildValue("{sissssssssss}",
++	board_info = Py_BuildValue("{sissssssssssss}",
 +				   "P1_REVISION",rpiinfo.p1_revision,
 +				   "REVISION",&rpiinfo.revision,
 +        			   "TYPE",rpiinfo.type,
 +				   "MANUFACTURER",rpiinfo.manufacturer,
 +				   "PROCESSOR",rpiinfo.processor,
++				   "BREV",rpiinfo.brev,
 +				   "RAM",rpiinfo.ram);
 +	PyModule_AddObject(module, "RPI_INFO", board_info);
  
@@ -3185,9 +3188,9 @@ diff -urN WebIOPi-0.7.1/python/native/bridge.c WebIOPi-0.7.1a/python/native/brid
  
  	if (Py_AtExit(cleanup) != 0)
  	{
-diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpuinfo.c
---- WebIOPi-0.7.1/python/native/cpuinfo.c	2012-10-29 06:26:10.000000000 +0900
-+++ WebIOPi-0.7.1a/python/native/cpuinfo.c	2021-11-06 23:25:13.535440558 +0900
+diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.c WebIOPi-0.7.1/python/native/cpuinfo.c
+--- WebIOPi-0.7.1org/python/native/cpuinfo.c	2012-10-29 06:26:10.000000000 +0900
++++ WebIOPi-0.7.1/python/native/cpuinfo.c	2023-11-18 15:52:50.956411889 +0900
 @@ -1,5 +1,5 @@
  /*
 -Copyright (c) 2012 Ben Croston
@@ -3195,7 +3198,7 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
  this software and associated documentation files (the "Software"), to deal in
-@@ -20,46 +20,266 @@
+@@ -20,46 +20,299 @@
  SOFTWARE.
  */
  
@@ -3247,7 +3250,8 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +             strcmp(hardware, "BCM2835") == 0 ||
 +             strcmp(hardware, "BCM2836") == 0 ||
 +             strcmp(hardware, "BCM2837") == 0 ||
-+             strcmp(hardware, "BCM2711") == 0 ) {
++             strcmp(hardware, "BCM2711") == 0 ||
++             strcmp(hardware, "BCM2712") == 0 ) {
 +            found = 1;
 +         }
 +         sscanf(buffer, "Revision	: %s", revision);
@@ -3284,8 +3288,21 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +      // new scheme
 +      //info->rev = revision[len-1]-'0';
 +      strcpy(info->revision, revision);
++      switch (revision[len-1]) {
++         case '0': info->brev = "1.0"; break;
++         case '1': info->brev = "1.1"; break;
++         case '2': info->brev = "1.2"; break;
++         case '3': info->brev = "1.3"; break;
++         case '4': info->brev = "1.4"; break;
++         case '5': info->brev = "1.5"; break;
++         case '6': info->brev = "1.6"; break;
++         case '7': info->brev = "1.7"; break;
++         case '8': info->brev = "1.8"; break;
++         case '9': info->brev = "1.9"; break;
++         default : info->brev = "Unknown"; break;
++      }
 +      switch (revision[len-3]) {
-+         case '0' :
++         case '0':
 +            switch (revision[len-2]) {
 +               case '0': info->type = "Raspberry Pi Model A"; info->p1_revision = 2; break;
 +               case '1': info->type = "Raspberry Pi Model B"; info->p1_revision = 2; break;
@@ -3309,11 +3326,12 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +               case '2': info->type = "Raspberry Pi Zero 2 W"; info->p1_revision = 4; break;
 +               case '3': info->type = "Raspberry Pi 400"; info->p1_revision = 3; break;
 +               case '4': info->type = "Compute Mudule 4"; info->p1_revision = 0; break;
++               case '5': info->type = "Compute Mudule 4S"; info->p1_revision = 0; break;
++               case '7': info->type = "Raspberry Pi 5 Model B"; info->p1_revision = 3; break;
 +               default : info->type = "Unknown"; info->p1_revision = 3; break;
 +            } break;
 +         default: info->type = "Unknown"; info->p1_revision = 3; break;
 +      }
-+
 +      switch (revision[len-4]) {
 +         case '0': info->processor = "BCM2835"; break;
 +         case '1': info->processor = "BCM2836"; break;
@@ -3331,6 +3349,7 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +                     case '4': info->processor = "BCM2711C0"; break;
 +                     default : info->processor = "BCM2711"; break;
 +               } break;
++         case '4': info->processor = "BCM2712"; break;
 +         default : info->processor = "Unknown"; break;
 +      }
 +      switch (revision[len-5]) {
@@ -3357,6 +3376,7 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +      info->manufacturer = "Unknown";
 +      info->processor = "Unknown";
 +      info->type = "Unknown";
++      info->brev = "Unknown";
 +      strcpy(info->revision, revision);
 +
 +      uint64_t rev;
@@ -3365,96 +3385,112 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +
 +      if (rev == 0x0002 || rev == 0x0003) {
 +         info->type = "Raspberry Pi Model B";
++         info->brev = "1.0";
 +         info->p1_revision = 1;
 +         info->ram = "256M";
 +         info->manufacturer = "Egoman";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0004) {
 +         info->type = "Raspberry Pi Model B";
++         info->brev = "2.0";
 +         info->p1_revision = 2;
 +         info->ram = "256M";
 +         info->manufacturer = "Sony UK";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0005) {
 +         info->type = "Raspberry Pi Model B";
++         info->brev = "2.0";
 +         info->p1_revision = 2;
 +         info->ram = "256M";
 +         info->manufacturer = "Qisda";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0006) {
 +         info->type = "Raspberry Pi Model B";
++         info->brev = "2.0";
 +         info->p1_revision = 2;
 +         info->ram = "256M";
 +         info->manufacturer = "Egoman";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0007) {
 +         info->type = "Raspberry Pi Model A";
++         info->brev = "2.0";
 +         info->p1_revision = 2;
 +         info->ram = "256M";
 +         info->manufacturer = "Egoman";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0008) {
 +         info->type = "Raspberry Pi Model A";
++         info->brev = "2.0";
 +         info->p1_revision = 2;
 +         info->ram = "256M";
 +         info->manufacturer = "Sony UK";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0009) {
 +         info->type = "Raspberry Pi Model A";
++         info->brev = "2.0";
 +         info->p1_revision = 2;
 +         info->ram = "256M";
 +         info->manufacturer = "Qisda";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x000d) {
 +         info->type = "Raspberry Pi Model B";
++         info->brev = "2.0";
 +         info->p1_revision = 2;
 +         info->ram = "512M";
 +         info->manufacturer = "Egoman";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x000e) {
 +         info->type = "Raspberry Pi Model B";
++         info->brev = "2.0";
 +         info->p1_revision = 2;
 +         info->ram = "512M";
 +         info->manufacturer = "Sony UK";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x000f) {
 +         info->type = "Raspberry Pi Model B";
++         info->brev = "2.0";
 +         info->p1_revision = 2;
 +         info->ram = "512M";
 +         info->manufacturer = "Egoman";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0010) {
 +         info->type = "Raspberry Pi Model B+";
++         info->brev = "1.2";
 +         info->p1_revision = 3;
 +         info->ram = "512M";
 +         info->manufacturer = "Sony UK";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0011) {
 +         info->type = "Compute Module 1";
++         info->brev = "1.0";
 +         info->p1_revision = 0;
 +         info->ram = "512M";
 +         info->manufacturer = "Sony UK";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0012) {
 +         info->type = "Raspberry Pi Model A+";
++         info->brev = "1.1";
 +         info->p1_revision = 3;
 +         info->ram = "256M";
 +         info->manufacturer = "Sony UK";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0013) {
 +         info->type = "Raspberry Pi Model B+";
++         info->brev = "1.2";
 +         info->p1_revision = 3;
 +         info->ram = "512M";
 +         info->manufacturer = "Embest";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0014) {
 +         info->type = "Compute Module 1";
++         info->brev = "1.0";
 +         info->p1_revision = 0;
 +         info->ram = "512M";
 +         info->manufacturer = "Embest";
 +         info->processor = "BCM2835";
 +      } else if (rev == 0x0015) {
 +         info->type = "Raspberry Pi Model A+";
++         info->brev = "1.1";
 +         info->p1_revision = 3;
 +         info->ram = "Unknown";
 +         info->manufacturer = "Embest";
@@ -3490,9 +3526,9 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1a/python/native/cpu
 +V revision (0-15)
 +
 +*/
-diff -urN WebIOPi-0.7.1/python/native/cpuinfo.h WebIOPi-0.7.1a/python/native/cpuinfo.h
---- WebIOPi-0.7.1/python/native/cpuinfo.h	2012-10-29 06:26:10.000000000 +0900
-+++ WebIOPi-0.7.1a/python/native/cpuinfo.h	2021-06-23 00:12:01.586499591 +0900
+diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.h WebIOPi-0.7.1/python/native/cpuinfo.h
+--- WebIOPi-0.7.1org/python/native/cpuinfo.h	2012-10-29 06:26:10.000000000 +0900
++++ WebIOPi-0.7.1/python/native/cpuinfo.h	2023-11-18 14:46:29.164221772 +0900
 @@ -1,5 +1,5 @@
  /*
 -Copyright (c) 2012 Ben Croston
@@ -3500,7 +3536,7 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.h WebIOPi-0.7.1a/python/native/cpu
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
  this software and associated documentation files (the "Software"), to deal in
-@@ -20,4 +20,18 @@
+@@ -20,4 +20,19 @@
  SOFTWARE.
  */
  
@@ -3514,15 +3550,16 @@ diff -urN WebIOPi-0.7.1/python/native/cpuinfo.h WebIOPi-0.7.1a/python/native/cpu
 +   char *manufacturer;
 +   char *processor;
 +   char *type;
++   char *brev;
 +   char revision[1024];
 +} rpi_info;
 +#endif /* CPUINFO_H */
 +
 +int get_rpi_info(rpi_info *info);
 +rpi_info rpiinfo;
-diff -urN WebIOPi-0.7.1/python/native/gpio.c WebIOPi-0.7.1a/python/native/gpio.c
---- WebIOPi-0.7.1/python/native/gpio.c	2013-02-04 07:04:18.000000000 +0900
-+++ WebIOPi-0.7.1a/python/native/gpio.c	2021-06-23 00:12:01.596499593 +0900
+diff -urN WebIOPi-0.7.1org/python/native/gpio.c WebIOPi-0.7.1/python/native/gpio.c
+--- WebIOPi-0.7.1org/python/native/gpio.c	2013-02-04 07:04:18.000000000 +0900
++++ WebIOPi-0.7.1/python/native/gpio.c	2023-11-18 16:44:02.767484396 +0900
 @@ -20,17 +20,18 @@
  SOFTWARE.
  */
@@ -3649,9 +3686,9 @@ diff -urN WebIOPi-0.7.1/python/native/gpio.c WebIOPi-0.7.1a/python/native/gpio.c
  }
  
  //updated Eric PTAK - trouch.com
-diff -urN WebIOPi-0.7.1/python/webiopi/devices/bus.py WebIOPi-0.7.1a/python/webiopi/devices/bus.py
---- WebIOPi-0.7.1/python/webiopi/devices/bus.py	2013-04-18 06:41:06.000000000 +0900
-+++ WebIOPi-0.7.1a/python/webiopi/devices/bus.py	2021-06-21 01:08:30.478784185 +0900
+diff -urN WebIOPi-0.7.1org/python/webiopi/devices/bus.py WebIOPi-0.7.1/python/webiopi/devices/bus.py
+--- WebIOPi-0.7.1org/python/webiopi/devices/bus.py	2013-04-18 06:41:06.000000000 +0900
++++ WebIOPi-0.7.1/python/webiopi/devices/bus.py	2023-11-18 16:44:02.767484396 +0900
 @@ -15,12 +15,18 @@
  import os
  import time
@@ -3673,9 +3710,9 @@ diff -urN WebIOPi-0.7.1/python/webiopi/devices/bus.py WebIOPi-0.7.1a/python/webi
      "UART": {"enabled": False, "gpio": {14:"TX", 15:"RX"}},
      "ONEWIRE": {"enabled": False, "gpio": {4:"DATA"}, "modules": ["w1-gpio"], "wait": 2}
  }
-diff -urN WebIOPi-0.7.1/python/webiopi/protocols/http.py WebIOPi-0.7.1a/python/webiopi/protocols/http.py
---- WebIOPi-0.7.1/python/webiopi/protocols/http.py	2014-02-22 07:31:18.000000000 +0900
-+++ WebIOPi-0.7.1a/python/webiopi/protocols/http.py	2021-06-23 00:12:01.596499593 +0900
+diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/http.py WebIOPi-0.7.1/python/webiopi/protocols/http.py
+--- WebIOPi-0.7.1org/python/webiopi/protocols/http.py	2014-02-22 07:31:18.000000000 +0900
++++ WebIOPi-0.7.1/python/webiopi/protocols/http.py	2023-11-18 16:44:02.767484396 +0900
 @@ -194,13 +194,23 @@
          
          (contentType, encoding) = mime.guess_type(path)
@@ -3704,9 +3741,9 @@ diff -urN WebIOPi-0.7.1/python/webiopi/protocols/http.py WebIOPi-0.7.1a/python/w
          self.logRequest(200)
          
      def processRequest(self):
-diff -urN WebIOPi-0.7.1/python/webiopi/protocols/rest.py WebIOPi-0.7.1a/python/webiopi/protocols/rest.py
---- WebIOPi-0.7.1/python/webiopi/protocols/rest.py	2013-04-18 06:41:06.000000000 +0900
-+++ WebIOPi-0.7.1a/python/webiopi/protocols/rest.py	2021-06-23 00:12:01.596499593 +0900
+diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/rest.py WebIOPi-0.7.1/python/webiopi/protocols/rest.py
+--- WebIOPi-0.7.1org/python/webiopi/protocols/rest.py	2013-04-18 06:41:06.000000000 +0900
++++ WebIOPi-0.7.1/python/webiopi/protocols/rest.py	2023-11-18 16:44:02.771484309 +0900
 @@ -161,6 +161,12 @@
              revision = "%s" % BOARD_REVISION
              return (200, revision, M_PLAIN)
@@ -3720,9 +3757,9 @@ diff -urN WebIOPi-0.7.1/python/webiopi/protocols/rest.py WebIOPi-0.7.1a/python/w
          # Single GPIO getter
          elif relativePath.startswith("GPIO/"):
              return self.callDeviceFunction("GET", relativePath)
-diff -urN WebIOPi-0.7.1/python/webiopi/utils/thread.py WebIOPi-0.7.1a/python/webiopi/utils/thread.py
---- WebIOPi-0.7.1/python/webiopi/utils/thread.py	2013-04-18 06:41:06.000000000 +0900
-+++ WebIOPi-0.7.1a/python/webiopi/utils/thread.py	2021-06-23 00:12:01.596499593 +0900
+diff -urN WebIOPi-0.7.1org/python/webiopi/utils/thread.py WebIOPi-0.7.1/python/webiopi/utils/thread.py
+--- WebIOPi-0.7.1org/python/webiopi/utils/thread.py	2013-04-18 06:41:06.000000000 +0900
++++ WebIOPi-0.7.1/python/webiopi/utils/thread.py	2023-11-18 16:44:02.771484309 +0900
 @@ -33,14 +33,14 @@
              task.stop()
                  
@@ -3740,9 +3777,9 @@ diff -urN WebIOPi-0.7.1/python/webiopi/utils/thread.py WebIOPi-0.7.1a/python/web
              TASKS.append(Task(func, True))
          else:
              while RUNNING:
-diff -urN WebIOPi-0.7.1/python/webiopi/utils/version.py WebIOPi-0.7.1a/python/webiopi/utils/version.py
---- WebIOPi-0.7.1/python/webiopi/utils/version.py	2015-02-05 05:21:44.000000000 +0900
-+++ WebIOPi-0.7.1a/python/webiopi/utils/version.py	2021-06-23 00:12:01.596499593 +0900
+diff -urN WebIOPi-0.7.1org/python/webiopi/utils/version.py WebIOPi-0.7.1/python/webiopi/utils/version.py
+--- WebIOPi-0.7.1org/python/webiopi/utils/version.py	2015-02-05 05:21:44.000000000 +0900
++++ WebIOPi-0.7.1/python/webiopi/utils/version.py	2023-11-18 16:44:02.771484309 +0900
 @@ -1,14 +1,15 @@
  import re
  import sys
@@ -3777,9 +3814,9 @@ diff -urN WebIOPi-0.7.1/python/webiopi/utils/version.py WebIOPi-0.7.1a/python/we
  except:
      pass
  
-diff -urN WebIOPi-0.7.1/setup.sh WebIOPi-0.7.1a/setup.sh
---- WebIOPi-0.7.1/setup.sh	2015-02-05 05:21:44.000000000 +0900
-+++ WebIOPi-0.7.1a/setup.sh	2021-06-23 00:12:01.596499593 +0900
+diff -urN WebIOPi-0.7.1org/setup.sh WebIOPi-0.7.1/setup.sh
+--- WebIOPi-0.7.1org/setup.sh	2015-02-05 05:21:44.000000000 +0900
++++ WebIOPi-0.7.1/setup.sh	2023-11-18 16:44:02.771484309 +0900
 @@ -79,6 +79,14 @@
  echo "Copying HTML resources..."
  mkdir /usr/share/webiopi 2>/dev/null 1>/dev/null
