@@ -1,6 +1,6 @@
 diff -urN WebIOPi-0.7.1org/htdocs/index.html WebIOPi-0.7.1/htdocs/index.html
 --- WebIOPi-0.7.1org/htdocs/index.html	2014-02-03 02:55:16.000000000 +0900
-+++ WebIOPi-0.7.1/htdocs/index.html	2023-11-18 16:44:01.287516360 +0900
++++ WebIOPi-0.7.1/htdocs/index.html	2023-11-20 13:20:52.748514349 +0900
 @@ -4,10 +4,18 @@
  	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
  	<meta name="viewport" content = "width = 420, user-scalable = no" /> 
@@ -22,7 +22,7 @@ diff -urN WebIOPi-0.7.1org/htdocs/index.html WebIOPi-0.7.1/htdocs/index.html
  <p>Control and Debug the Raspberry Pi GPIO with a display which looks like the physical header.</p>
 diff -urN WebIOPi-0.7.1org/htdocs/webiopi.css WebIOPi-0.7.1/htdocs/webiopi.css
 --- WebIOPi-0.7.1org/htdocs/webiopi.css	2014-02-01 05:02:27.000000000 +0900
-+++ WebIOPi-0.7.1/htdocs/webiopi.css	2023-11-18 16:44:01.291516273 +0900
++++ WebIOPi-0.7.1/htdocs/webiopi.css	2023-11-20 13:20:52.758514546 +0900
 @@ -28,7 +28,7 @@
  }
  
@@ -71,7 +71,7 @@ diff -urN WebIOPi-0.7.1org/htdocs/webiopi.css WebIOPi-0.7.1/htdocs/webiopi.css
  .FunctionBasic {
 diff -urN WebIOPi-0.7.1org/htdocs/webiopi.js WebIOPi-0.7.1/htdocs/webiopi.js
 --- WebIOPi-0.7.1org/htdocs/webiopi.js	2014-02-24 01:37:07.000000000 +0900
-+++ WebIOPi-0.7.1/htdocs/webiopi.js	2023-11-18 14:46:09.756486264 +0900
++++ WebIOPi-0.7.1/htdocs/webiopi.js	2023-11-20 13:20:52.768514742 +0900
 @@ -1,1518 +1,1533 @@
 -/*
 -   Copyright 2012-2013 Eric Ptak - trouch.com
@@ -3126,7 +3126,7 @@ diff -urN WebIOPi-0.7.1org/htdocs/webiopi.js WebIOPi-0.7.1/htdocs/webiopi.js
 +}
 diff -urN WebIOPi-0.7.1org/python/native/bridge.c WebIOPi-0.7.1/python/native/bridge.c
 --- WebIOPi-0.7.1org/python/native/bridge.c	2013-03-17 21:56:40.000000000 +0900
-+++ WebIOPi-0.7.1/python/native/bridge.c	2023-11-18 15:50:32.328196429 +0900
++++ WebIOPi-0.7.1/python/native/bridge.c	2023-11-20 13:20:52.768514742 +0900
 @@ -28,6 +28,8 @@
  static PyObject *_InvalidDirectionException;
  static PyObject *_InvalidChannelException;
@@ -3190,7 +3190,7 @@ diff -urN WebIOPi-0.7.1org/python/native/bridge.c WebIOPi-0.7.1/python/native/br
  	{
 diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.c WebIOPi-0.7.1/python/native/cpuinfo.c
 --- WebIOPi-0.7.1org/python/native/cpuinfo.c	2012-10-29 06:26:10.000000000 +0900
-+++ WebIOPi-0.7.1/python/native/cpuinfo.c	2023-11-18 15:52:50.956411889 +0900
++++ WebIOPi-0.7.1/python/native/cpuinfo.c	2023-11-20 13:20:52.768514742 +0900
 @@ -1,5 +1,5 @@
  /*
 -Copyright (c) 2012 Ben Croston
@@ -3528,11 +3528,11 @@ diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.c WebIOPi-0.7.1/python/native/c
 +*/
 diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.h WebIOPi-0.7.1/python/native/cpuinfo.h
 --- WebIOPi-0.7.1org/python/native/cpuinfo.h	2012-10-29 06:26:10.000000000 +0900
-+++ WebIOPi-0.7.1/python/native/cpuinfo.h	2023-11-18 14:46:29.164221772 +0900
++++ WebIOPi-0.7.1/python/native/cpuinfo.h	2023-11-20 13:20:52.778514938 +0900
 @@ -1,5 +1,5 @@
  /*
 -Copyright (c) 2012 Ben Croston
-+Copyright (c) 2012-2015 Ben Croston
++Copyright (c) 2012-2015 Ben Croston & 2021-2023 pochiken
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
  this software and associated documentation files (the "Software"), to deal in
@@ -3559,8 +3559,15 @@ diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.h WebIOPi-0.7.1/python/native/c
 +rpi_info rpiinfo;
 diff -urN WebIOPi-0.7.1org/python/native/gpio.c WebIOPi-0.7.1/python/native/gpio.c
 --- WebIOPi-0.7.1org/python/native/gpio.c	2013-02-04 07:04:18.000000000 +0900
-+++ WebIOPi-0.7.1/python/native/gpio.c	2023-11-18 16:44:02.767484396 +0900
-@@ -20,17 +20,18 @@
++++ WebIOPi-0.7.1/python/native/gpio.c	2023-11-20 13:20:52.778514938 +0900
+@@ -1,5 +1,5 @@
+ /*
+-Copyright (c) 2012 Ben Croston / 2012-2013 Eric PTAK
++Copyright (c) 2012-2021 Ben Croston / 2012-2013 Eric PTAK / 2021-2023 pochiken
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of
+ this software and associated documentation files (the "Software"), to deal in
+@@ -20,28 +20,39 @@
  SOFTWARE.
  */
  
@@ -3578,60 +3585,176 @@ diff -urN WebIOPi-0.7.1org/python/native/gpio.c WebIOPi-0.7.1/python/native/gpio
  
 -#define BCM2708_PERI_BASE   0x20000000
 -#define GPIO_BASE           (BCM2708_PERI_BASE + 0x200000)
- #define FSEL_OFFSET         0   // 0x0000
- #define SET_OFFSET          7   // 0x001c / 4
- #define CLR_OFFSET          10  // 0x0028 / 4
-@@ -43,6 +44,11 @@
- #define PULLUPDN_OFFSET     37  // 0x0094 / 4
- #define PULLUPDNCLK_OFFSET  38  // 0x0098 / 4
- 
-+#define PULLUPDN_OFFSET_2711_0      57
-+#define PULLUPDN_OFFSET_2711_1      58
-+#define PULLUPDN_OFFSET_2711_2      59
-+#define PULLUPDN_OFFSET_2711_3      60
+-#define FSEL_OFFSET         0   // 0x0000
+-#define SET_OFFSET          7   // 0x001c / 4
+-#define CLR_OFFSET          10  // 0x0028 / 4
+-#define PINLEVEL_OFFSET     13  // 0x0034 / 4
+-#define EVENT_DETECT_OFFSET 16  // 0x0040 / 4
+-#define RISING_ED_OFFSET    19  // 0x004c / 4
+-#define FALLING_ED_OFFSET   22  // 0x0058 / 4
+-#define HIGH_DETECT_OFFSET  25  // 0x0064 / 4
+-#define LOW_DETECT_OFFSET   28  // 0x0070 / 4
+-#define PULLUPDN_OFFSET     37  // 0x0094 / 4
+-#define PULLUPDNCLK_OFFSET  38  // 0x0098 / 4
++#define BCM2708_PERI_BASE_DEFAULT  0x20000000
++#define BCM2709_PERI_BASE_DEFAULT  0x3f000000
++#define BCM2710_PERI_BASE_DEFAULT  0x3f000000
++#define BCM2711_PERI_BASE_DEFAULT  0xfe000000
++#define GPIO_BASE_OFFSET           0x200000
++#define FSEL_OFFSET                0   // 0x0000
++#define SET_OFFSET                 7   // 0x001c / 4
++#define CLR_OFFSET                 10  // 0x0028 / 4
++#define PINLEVEL_OFFSET            13  // 0x0034 / 4
++#define EVENT_DETECT_OFFSET        16  // 0x0040 / 4
++#define RISING_ED_OFFSET           19  // 0x004c / 4
++#define FALLING_ED_OFFSET          22  // 0x0058 / 4
++#define HIGH_DETECT_OFFSET         25  // 0x0064 / 4
++#define LOW_DETECT_OFFSET          28  // 0x0070 / 4
++#define PULLUPDN_OFFSET            37  // 0x0094 / 4
++#define PULLUPDNCLK_OFFSET         38  // 0x0098 / 4
 +
++#define PULLUPDN_OFFSET_2711_0     57
++#define PULLUPDN_OFFSET_2711_1     58
++#define PULLUPDN_OFFSET_2711_2     59
++#define PULLUPDN_OFFSET_2711_3     60
+ 
  #define PAGE_SIZE  (4*1024)
  #define BLOCK_SIZE (4*1024)
+@@ -61,9 +72,8 @@
+ {
+     int i;
+     
+-    for (i=0; i<150; i++)     // wait 150 cycles
+-    {
+-		asm volatile("nop");
++    for (i=0; i<150; i++) {    // wait 150 cycles
++	asm volatile("nop");
+     }
+ }
  
-@@ -83,7 +89,31 @@
+@@ -71,43 +81,224 @@
+ {
+     int mem_fd;
+     uint8_t *gpio_mem;
++    uint32_t peri_base = 0;
++    uint32_t gpio_base;
++    uint8_t ranges[12] = { 0 };
++    uint8_t rev[4] = { 0 };
++    uint32_t cpu = 0;
++    FILE *fp;
++    char buffer[1024];
++    char hardware[1024];
++    int found = 0;
+ 
+-    if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0)
++    // try /dev/gpiomem first - this does not require root privs
++    if ((mem_fd = open("/dev/gpiomem", O_RDWR|O_SYNC)) > 0)
+     {
+-        return SETUP_DEVMEM_FAIL;
++        if ((gpio_map = (uint32_t *)mmap(NULL, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, mem_fd, 0)) == MAP_FAILED) { 
++            return SETUP_MMAP_FAIL;
++        } else {
++            return SETUP_OK;
++        }
++    }
++
++    // revert to /dev/mem method - requires root privs
++
++    if ((fp = fopen("/proc/device-tree/soc/ranges", "rb")) != NULL)
++    {
++        // get peri base from device tree
++        if (fread(ranges, 1, sizeof(ranges), fp) >= 8) {
++            peri_base = ranges[4] << 24 | ranges[5] << 16 | ranges[6] << 8 | ranges[7] << 0;
++            if (!peri_base) {
++                peri_base = ranges[8] << 24 | ranges[9] << 16 | ranges[10] << 8 | ranges[11] << 0;
++            }
++        }
++        if ((ranges[0] != 0x7e) ||
++            (ranges[1] != 0x00) ||
++            (ranges[2] != 0x00) ||
++            (ranges[3] != 0x00) ||
++            ((peri_base != BCM2708_PERI_BASE_DEFAULT) &&
++             (peri_base != BCM2709_PERI_BASE_DEFAULT) &&
++             (peri_base != BCM2711_PERI_BASE_DEFAULT))) {
++                 // invalid ranges file
++                 peri_base = 0;
++        }
++        fclose(fp);
+     }
+ 
++    // guess peri_base based on /proc/device-tree/system/linux,revision
++    if (!peri_base) {
++        if ((fp = fopen("/proc/device-tree/system/linux,revision", "rb")) != NULL) {
++            if (fread(rev, 1, sizeof(rev), fp) == 4) {
++                cpu = (rev[2] >> 4) & 0xf;
++                switch (cpu) {
++                    case 0 : peri_base = BCM2708_PERI_BASE_DEFAULT;
++                             break;
++                    case 1 :
++                    case 2 : peri_base = BCM2709_PERI_BASE_DEFAULT;
++                             break;
++                    case 3 : peri_base = BCM2711_PERI_BASE_DEFAULT;
++                             break;
++                }
++            }
++            fclose(fp);
++        }
++    }
++
++    // guess peri_base based on /proc/cpuinfo hardware field
++    if (!peri_base) {
++        if ((fp = fopen("/proc/cpuinfo", "r")) == NULL)
++            return SETUP_CPUINFO_FAIL;
++
++        while(!feof(fp) && !found && fgets(buffer, sizeof(buffer), fp)) {
++            sscanf(buffer, "Hardware    : %s", hardware);
++            if (strcmp(hardware, "BCM2708") == 0 || strcmp(hardware, "BCM2835") == 0) {
++                // pi 1 hardware
++                peri_base = BCM2708_PERI_BASE_DEFAULT;
++            } else if (strcmp(hardware, "BCM2709") == 0 || strcmp(hardware, "BCM2836") == 0) {
++                // pi 2 hardware
++                peri_base = BCM2709_PERI_BASE_DEFAULT;
++            } else if (strcmp(hardware, "BCM2710") == 0 || strcmp(hardware, "BCM2837") == 0) {
++                // pi 3 hardware
++                peri_base = BCM2710_PERI_BASE_DEFAULT;
++            } else if (strcmp(hardware, "BCM2711") == 0) {
++                // pi 4 hardware
++                peri_base = BCM2711_PERI_BASE_DEFAULT;
++            }
++        }
++        fclose(fp);
++    }
++
++    if (!peri_base)
++        return SETUP_NO_PERI_ADDR;
++
++    gpio_base = peri_base + GPIO_BASE_OFFSET;
++
++    // mmap the GPIO memory registers
++    if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0)
++        return SETUP_DEVMEM_FAIL;
++
+     if ((gpio_mem = malloc(BLOCK_SIZE + (PAGE_SIZE-1))) == NULL)
+         return SETUP_MALLOC_FAIL;
+ 
      if ((uint32_t)gpio_mem % PAGE_SIZE)
          gpio_mem += PAGE_SIZE - ((uint32_t)gpio_mem % PAGE_SIZE);
  
 -    gpio_map = (uint32_t *)mmap( (caddr_t)gpio_mem, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, mem_fd, GPIO_BASE);
-+    char buffer[12];
-+    const char *ranges_file = "/proc/device-tree/soc/ranges";
-+    int info_fd = open(ranges_file, O_RDONLY);
-+
-+    if (info_fd < 0) {
-+        fprintf(stderr, "cannot open: %s", ranges_file);
-+        return SETUP_MMAP_FAIL;
-+    }
-+
-+    ssize_t n = read(info_fd, buffer, sizeof(buffer));
-+    close(info_fd);
-+
-+    if (n < 8) {
-+        fprintf(stderr, "cannot read base address: %s", ranges_file);
-+        return SETUP_MMAP_FAIL;
-+    }
-+
-+    uint32_t gpio_offset = 0x00200000;
-+    uint32_t gpio_base =  (buffer[4] << 24) + (buffer[5] << 16) + (buffer[6] << 8) + (buffer[7] << 0) + gpio_offset;
-+
-+    if (gpio_base == gpio_offset) {
-+        gpio_base =  (buffer[8] << 24) + (buffer[9] << 16) + (buffer[10] << 8) + (buffer[11] << 0) + gpio_offset;
-+    }
-+
-+    gpio_map = (uint32_t *)mmap( (caddr_t)gpio_mem, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, mem_fd, gpio_base);
- 
-     if ((uint32_t)gpio_map < 0)
+-
+-    if ((uint32_t)gpio_map < 0)
++    if ((gpio_map = (uint32_t *)mmap( (void *)gpio_mem, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, mem_fd, gpio_base)) == MAP_FAILED)
          return SETUP_MMAP_FAIL;
-@@ -93,21 +123,44 @@
  
- void set_pullupdn(int gpio, int pud)
+     return SETUP_OK;
+ }
+ 
+-void set_pullupdn(int gpio, int pud)
++void clear_event_detect(int gpio)
  {
 -    int clk_offset = PULLUPDNCLK_OFFSET + (gpio/32);
--    int shift = (gpio%32);
++    int offset = EVENT_DETECT_OFFSET + (gpio/32);
+     int shift = (gpio%32);
 -    
 -    if (pud == PUD_DOWN)
 -       *(gpio_map+PULLUPDN_OFFSET) = (*(gpio_map+PULLUPDN_OFFSET) & ~3) | PUD_DOWN;
@@ -3642,41 +3765,108 @@ diff -urN WebIOPi-0.7.1org/python/native/gpio.c WebIOPi-0.7.1/python/native/gpio
 -    
 -    short_wait();
 -    *(gpio_map+clk_offset) = 1 << shift;
--    short_wait();
++
++    *(gpio_map+offset) |= (1 << shift);
+     short_wait();
 -    *(gpio_map+PULLUPDN_OFFSET) &= ~3;
 -    *(gpio_map+clk_offset) = 0;
++    *(gpio_map+offset) = 0;
++}
++
++int eventdetected(int gpio)
++{
++    int offset, value, bit;
++
++    offset = EVENT_DETECT_OFFSET + (gpio/32);
++    bit = (1 << (gpio%32));
++    value = *(gpio_map+offset) & bit;
++    if (value)
++        clear_event_detect(gpio);
++    return value;
++}
++
++void set_rising_event(int gpio, int enable)
++{
++    int offset = RISING_ED_OFFSET + (gpio/32);
++    int shift = (gpio%32);
++
++    if (enable)
++        *(gpio_map+offset) |= 1 << shift;
++    else
++        *(gpio_map+offset) &= ~(1 << shift);
++    clear_event_detect(gpio);
++}
++
++void set_falling_event(int gpio, int enable)
++{
++    int offset = FALLING_ED_OFFSET + (gpio/32);
++    int shift = (gpio%32);
++
++    if (enable) {
++        *(gpio_map+offset) |= (1 << shift);
++        *(gpio_map+offset) = (1 << shift);
++    } else {
++        *(gpio_map+offset) &= ~(1 << shift);
++    }
++    clear_event_detect(gpio);
++}
++
++void set_high_event(int gpio, int enable)
++{
++    int offset = HIGH_DETECT_OFFSET + (gpio/32);
++    int shift = (gpio%32);
++
++    if (enable)
++        *(gpio_map+offset) |= (1 << shift);
++    else
++        *(gpio_map+offset) &= ~(1 << shift);
++    clear_event_detect(gpio);
++}
++
++void set_low_event(int gpio, int enable)
++{
++    int offset = LOW_DETECT_OFFSET + (gpio/32);
++    int shift = (gpio%32);
++
++    if (enable)
++        *(gpio_map+offset) |= 1 << shift;
++    else
++        *(gpio_map+offset) &= ~(1 << shift);
++    clear_event_detect(gpio);
++}
++
++void set_pullupdn(int gpio, int pud)
++{
 +    // Check GPIO register
 +    int is2711 = *(gpio_map+PULLUPDN_OFFSET_2711_3) != 0x6770696f;
 +    if (is2711) {
 +        // Pi 4 Pull-up/down method
-+       int pullreg = PULLUPDN_OFFSET_2711_0 + (gpio >> 4);
-+       int pullshift = (gpio & 0xf) << 1;
-+       unsigned int pullbits;
-+       unsigned int pull = 0;
-+       if (pud == PUD_DOWN){
-+           pull = 2;
-+        } else
-+        if (pud == PUD_UP){
-+           pull = 1;
-+        }
++        int pullreg = PULLUPDN_OFFSET_2711_0 + (gpio >> 4);
++        int pullshift = (gpio & 0xf) << 1;
++        unsigned int pullbits;
++        unsigned int pull = 0;
++        switch (pud) {
++            case PUD_OFF:  pull = 0; break;
++            case PUD_UP:   pull = 1; break;
++            case PUD_DOWN: pull = 2; break;
++            default:       pull = 0; // switch PUD to OFF for other values
++        } 
 +        pullbits = *(gpio_map + pullreg);
 +        pullbits &= ~(3 << pullshift);
 +        pullbits |= (pull << pullshift);
 +        *(gpio_map + pullreg) = pullbits;
-+    }
-+    else
-+    {
++    } else {
 +        // Legacy Pull-up/down method
 +        int clk_offset = PULLUPDNCLK_OFFSET + (gpio/32);
 +        int shift = (gpio%32);
 +
-+        if (pud == PUD_DOWN)
++        if (pud == PUD_DOWN) {
 +            *(gpio_map+PULLUPDN_OFFSET) = (*(gpio_map+PULLUPDN_OFFSET) & ~3) | PUD_DOWN;
-+        else if (pud == PUD_UP)
++        } else if (pud == PUD_UP) {
 +            *(gpio_map+PULLUPDN_OFFSET) = (*(gpio_map+PULLUPDN_OFFSET) & ~3) | PUD_UP;
-+        else  // pud == PUD_OFF
++        } else  { // pud == PUD_OFF
 +            *(gpio_map+PULLUPDN_OFFSET) &= ~3;
-+
++        }
 +        short_wait();
 +        *(gpio_map+clk_offset) = 1 << shift;
 +        short_wait();
@@ -3686,9 +3876,91 @@ diff -urN WebIOPi-0.7.1org/python/native/gpio.c WebIOPi-0.7.1/python/native/gpio
  }
  
  //updated Eric PTAK - trouch.com
+@@ -125,7 +316,10 @@
+     int shift = (gpio%10)*3;
+ 
+     set_pullupdn(gpio, pud);
++    if (function == OUT)
+ 	*(gpio_map+offset) = (*(gpio_map+offset) & ~(7<<shift)) | (function<<shift);
++    else  // function == IN
++        *(gpio_map+offset) = (*(gpio_map+offset) & ~(7<<shift));
+ }
+ 
+ //added Eric PTAK - trouch.com
+@@ -324,6 +518,5 @@
+ 
+ void cleanup(void)
+ {
+-    // fixme - set all gpios back to input
+-    munmap((caddr_t)gpio_map, BLOCK_SIZE);
++    munmap((void *)gpio_map, BLOCK_SIZE);
+ }
+diff -urN WebIOPi-0.7.1org/python/native/gpio.h WebIOPi-0.7.1/python/native/gpio.h
+--- WebIOPi-0.7.1org/python/native/gpio.h	2013-02-04 07:04:18.000000000 +0900
++++ WebIOPi-0.7.1/python/native/gpio.h	2023-11-20 13:20:52.778514938 +0900
+@@ -20,24 +20,26 @@
+ SOFTWARE.
+ */
+ 
+-#define SETUP_OK          0
+-#define SETUP_DEVMEM_FAIL 1
+-#define SETUP_MALLOC_FAIL 2
+-#define SETUP_MMAP_FAIL   3
++#define SETUP_OK           0
++#define SETUP_DEVMEM_FAIL  1
++#define SETUP_MALLOC_FAIL  2
++#define SETUP_MMAP_FAIL    3
++#define SETUP_CPUINFO_FAIL 4
++#define SETUP_NO_PERI_ADDR 5
+ 
+ #define GPIO_COUNT 54
+ 
+-#define IN		0
+-#define OUT		1
++#define IN	0
++#define OUT	1
+ #define ALT5	2
+ #define ALT4	3
+ #define ALT0	4
+ #define ALT1	5
+ #define ALT2	6
+ #define ALT3	7
+-#define PWM		8
++#define PWM	8
+ 
+-#define LOW		0
++#define LOW	0
+ #define HIGH	1
+ 
+ #define PUD_OFF  0
+@@ -53,10 +55,11 @@
+ };
+ 
+ int setup(void);
+-int get_function(int gpio);
+ void set_function(int gpio, int function, int pud);
+-int input(int gpio);
++int get_function(int gpio);
+ void output(int gpio, int value);
++int input(int gpio);
++
+ void outputSequence(int gpio, int period, char* sequence);
+ struct pulse* getPulse(int gpio);
+ void pulseMilli(int gpio, int up, int down);
+diff -urN WebIOPi-0.7.1org/python/setup.py WebIOPi-0.7.1/python/setup.py
+--- WebIOPi-0.7.1org/python/setup.py	2015-02-05 05:21:44.000000000 +0900
++++ WebIOPi-0.7.1/python/setup.py	2023-11-19 21:51:23.307374987 +0900
+@@ -33,5 +33,6 @@
+                           "webiopi.devices.sensor",
+                           "webiopi.devices.shield"
+                           ],
+-      ext_modules      = [Extension('_webiopi.GPIO', ['native/bridge.c', 'native/gpio.c', 'native/cpuinfo.c'])],
++      ext_modules      = [Extension('_webiopi.GPIO', ['native/bridge.c', 'native/gpio.c', 'native/cpuinfo.c'],
++                       extra_compile_args = ["-fcommon"])],
+       )
 diff -urN WebIOPi-0.7.1org/python/webiopi/devices/bus.py WebIOPi-0.7.1/python/webiopi/devices/bus.py
 --- WebIOPi-0.7.1org/python/webiopi/devices/bus.py	2013-04-18 06:41:06.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/devices/bus.py	2023-11-18 16:44:02.767484396 +0900
++++ WebIOPi-0.7.1/python/webiopi/devices/bus.py	2023-11-20 13:20:52.778514938 +0900
 @@ -15,12 +15,18 @@
  import os
  import time
@@ -3712,7 +3984,7 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/devices/bus.py WebIOPi-0.7.1/python/we
  }
 diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/http.py WebIOPi-0.7.1/python/webiopi/protocols/http.py
 --- WebIOPi-0.7.1org/python/webiopi/protocols/http.py	2014-02-22 07:31:18.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/protocols/http.py	2023-11-18 16:44:02.767484396 +0900
++++ WebIOPi-0.7.1/python/webiopi/protocols/http.py	2023-11-20 13:20:52.778514938 +0900
 @@ -194,13 +194,23 @@
          
          (contentType, encoding) = mime.guess_type(path)
@@ -3743,7 +4015,7 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/http.py WebIOPi-0.7.1/python
      def processRequest(self):
 diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/rest.py WebIOPi-0.7.1/python/webiopi/protocols/rest.py
 --- WebIOPi-0.7.1org/python/webiopi/protocols/rest.py	2013-04-18 06:41:06.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/protocols/rest.py	2023-11-18 16:44:02.771484309 +0900
++++ WebIOPi-0.7.1/python/webiopi/protocols/rest.py	2023-11-20 13:20:52.778514938 +0900
 @@ -161,6 +161,12 @@
              revision = "%s" % BOARD_REVISION
              return (200, revision, M_PLAIN)
@@ -3759,7 +4031,7 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/rest.py WebIOPi-0.7.1/python
              return self.callDeviceFunction("GET", relativePath)
 diff -urN WebIOPi-0.7.1org/python/webiopi/utils/thread.py WebIOPi-0.7.1/python/webiopi/utils/thread.py
 --- WebIOPi-0.7.1org/python/webiopi/utils/thread.py	2013-04-18 06:41:06.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/utils/thread.py	2023-11-18 16:44:02.771484309 +0900
++++ WebIOPi-0.7.1/python/webiopi/utils/thread.py	2023-11-20 13:20:52.778514938 +0900
 @@ -33,14 +33,14 @@
              task.stop()
                  
@@ -3779,7 +4051,7 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/utils/thread.py WebIOPi-0.7.1/python/w
              while RUNNING:
 diff -urN WebIOPi-0.7.1org/python/webiopi/utils/version.py WebIOPi-0.7.1/python/webiopi/utils/version.py
 --- WebIOPi-0.7.1org/python/webiopi/utils/version.py	2015-02-05 05:21:44.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/utils/version.py	2023-11-18 16:44:02.771484309 +0900
++++ WebIOPi-0.7.1/python/webiopi/utils/version.py	2023-11-20 13:20:52.778514938 +0900
 @@ -1,14 +1,15 @@
  import re
  import sys
@@ -3816,7 +4088,7 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/utils/version.py WebIOPi-0.7.1/python/
  
 diff -urN WebIOPi-0.7.1org/setup.sh WebIOPi-0.7.1/setup.sh
 --- WebIOPi-0.7.1org/setup.sh	2015-02-05 05:21:44.000000000 +0900
-+++ WebIOPi-0.7.1/setup.sh	2023-11-18 16:44:02.771484309 +0900
++++ WebIOPi-0.7.1/setup.sh	2023-11-20 13:20:52.788515135 +0900
 @@ -79,6 +79,14 @@
  echo "Copying HTML resources..."
  mkdir /usr/share/webiopi 2>/dev/null 1>/dev/null
