@@ -1,0 +1,680 @@
+diff -urN WebIOPi-0.7.1/python/native/bridge.c WebIOPi-0.7.1next/python/native/bridge.c
+--- WebIOPi-0.7.1/python/native/bridge.c	2024-10-04 12:50:59.989477031 +0900
++++ WebIOPi-0.7.1next/python/native/bridge.c	2024-10-05 18:43:25.726969513 +0900
+@@ -1,5 +1,5 @@
+ /*
+-Copyright (c) 2012 Ben Croston / 2012-2013 Eric PTAK
++Copyright (c) 2012 Ben Croston / 2012-2013 Eric PTAK / 2023-2024 Pochi_ken
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of
+ this software and associated documentation files (the "Software"), to deal in
+@@ -46,12 +46,13 @@
+ static PyObject *_alt4;
+ static PyObject *_alt5;
+ static PyObject *_pwm;
++static PyObject *_none;
+ 
+ static PyObject *_pud_off;
+ static PyObject *_pud_up;
+ static PyObject *_pud_down;
+ 
+-static char* FUNCTIONS[] = {"IN", "OUT", "ALT5", "ALT4", "ALT0", "ALT1", "ALT2", "ALT3", "PWM"};
++static char* FUNCTIONS[] = {"IN", "OUT", "ALT5", "ALT4", "ALT0", "ALT1", "ALT2", "ALT3", "PWM", "NONE"};
+ static char* PWM_MODES[] = {"none", "ratio", "angle"};
+ 
+ static int module_state = -1;
+@@ -677,6 +678,9 @@
+ 	_pwm = Py_BuildValue("i", PWM);
+ 	PyModule_AddObject(module, "PWM", _pwm);
+ 
++	_none = Py_BuildValue("i", NONE);
++	PyModule_AddObject(module, "NONE", _none);
++
+ 	_pud_off = Py_BuildValue("i", PUD_OFF);
+ 	PyModule_AddObject(module, "PUD_OFF", _pud_off);
+ 
+diff -urN WebIOPi-0.7.1/python/native/gpio.c WebIOPi-0.7.1next/python/native/gpio.c
+--- WebIOPi-0.7.1/python/native/gpio.c	2024-10-04 12:50:59.993477738 +0900
++++ WebIOPi-0.7.1next/python/native/gpio.c	2024-10-05 18:34:01.871154699 +0900
+@@ -1,5 +1,5 @@
+ /*
+-Copyright (c) 2012-2021 Ben Croston / 2012-2013 Eric PTAK / 2021-2023 pochiken
++Copyright (c) 2024 pochinet.org@gmail.com
+ 
+ Permission is hereby granted, free of charge, to any person obtaining a copy of
+ this software and associated documentation files (the "Software"), to deal in
+@@ -36,7 +36,10 @@
+ #define BCM2709_PERI_BASE_DEFAULT  0x3f000000
+ #define BCM2710_PERI_BASE_DEFAULT  0x3f000000
+ #define BCM2711_PERI_BASE_DEFAULT  0xfe000000
++#define BCM2712_RPIO_BASE_DEFAULT  0x400d0000
+ #define GPIO_BASE_OFFSET           0x200000
++#define GPIO_SYS_BANK0             0x10000
++#define GPIO_PADS_BANK0            0x20000
+ #define FSEL_OFFSET                0   // 0x0000
+ #define SET_OFFSET                 7   // 0x001c / 4
+ #define CLR_OFFSET                 10  // 0x0028 / 4
+@@ -55,8 +58,14 @@
+ #define PULLUPDN_OFFSET_2711_3     60
+ 
+ #define PAGE_SIZE  (4*1024)
+-#define BLOCK_SIZE (4*1024)
++// #define BLOCK_SIZE (4*1024)
++#define BLOCK_SIZE 0x30000
+ 
++GPIOn_STATUS gpion_status[28];
++GPIOn_CTRL gpion_ctrl[28];
++INTR intr;
++VOLTAGE_SELECT voltage_select;
++GPIOn gpion[28];
+ static volatile uint32_t *gpio_map;
+ 
+ struct tspair {
+@@ -68,242 +77,42 @@
+ static struct tspair gpio_tspairs[GPIO_COUNT];
+ static pthread_t *gpio_threads[GPIO_COUNT];
+ 
+-void short_wait(void)
+-{
++void short_wait(void) {
+     int i;
+-    
+     for (i=0; i<150; i++) {    // wait 150 cycles
+-	asm volatile("nop");
++        asm volatile("nop");
+     }
+ }
+ 
+-int setup(void)
+-{
++int setup(void) {
+     int mem_fd;
+-    uint8_t *gpio_mem;
+-    uint32_t peri_base = 0;
+-    uint32_t gpio_base;
+-    uint8_t ranges[12] = { 0 };
+-    uint8_t rev[4] = { 0 };
+-    uint32_t cpu = 0;
+-    FILE *fp;
+-    char buffer[1024];
+-    char hardware[1024];
+-    int found = 0;
+-
+-    // try /dev/gpiomem first - this does not require root privs
+-    if ((mem_fd = open("/dev/gpiomem", O_RDWR|O_SYNC)) > 0)
+-    {
++
++    if ((mem_fd = open("/dev/gpiomem0", O_RDWR|O_SYNC)) > 0) {
+         if ((gpio_map = (uint32_t *)mmap(NULL, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, mem_fd, 0)) == MAP_FAILED) { 
+             return SETUP_MMAP_FAIL;
+         } else {
+             return SETUP_OK;
+         }
+     }
+-
+-    // revert to /dev/mem method - requires root privs
+-
+-    if ((fp = fopen("/proc/device-tree/soc/ranges", "rb")) != NULL)
+-    {
+-        // get peri base from device tree
+-        if (fread(ranges, 1, sizeof(ranges), fp) >= 8) {
+-            peri_base = ranges[4] << 24 | ranges[5] << 16 | ranges[6] << 8 | ranges[7] << 0;
+-            if (!peri_base) {
+-                peri_base = ranges[8] << 24 | ranges[9] << 16 | ranges[10] << 8 | ranges[11] << 0;
+-            }
+-        }
+-        if ((ranges[0] != 0x7e) ||
+-            (ranges[1] != 0x00) ||
+-            (ranges[2] != 0x00) ||
+-            (ranges[3] != 0x00) ||
+-            ((peri_base != BCM2708_PERI_BASE_DEFAULT) &&
+-             (peri_base != BCM2709_PERI_BASE_DEFAULT) &&
+-             (peri_base != BCM2711_PERI_BASE_DEFAULT))) {
+-                 // invalid ranges file
+-                 peri_base = 0;
+-        }
+-        fclose(fp);
+-    }
+-
+-    // guess peri_base based on /proc/device-tree/system/linux,revision
+-    if (!peri_base) {
+-        if ((fp = fopen("/proc/device-tree/system/linux,revision", "rb")) != NULL) {
+-            if (fread(rev, 1, sizeof(rev), fp) == 4) {
+-                cpu = (rev[2] >> 4) & 0xf;
+-                switch (cpu) {
+-                    case 0 : peri_base = BCM2708_PERI_BASE_DEFAULT;
+-                             break;
+-                    case 1 :
+-                    case 2 : peri_base = BCM2709_PERI_BASE_DEFAULT;
+-                             break;
+-                    case 3 : peri_base = BCM2711_PERI_BASE_DEFAULT;
+-                             break;
+-                }
+-            }
+-            fclose(fp);
+-        }
+-    }
+-
+-    // guess peri_base based on /proc/cpuinfo hardware field
+-    if (!peri_base) {
+-        if ((fp = fopen("/proc/cpuinfo", "r")) == NULL)
+-            return SETUP_CPUINFO_FAIL;
+-
+-        while(!feof(fp) && !found && fgets(buffer, sizeof(buffer), fp)) {
+-            sscanf(buffer, "Hardware    : %s", hardware);
+-            if (strcmp(hardware, "BCM2708") == 0 || strcmp(hardware, "BCM2835") == 0) {
+-                // pi 1 hardware
+-                peri_base = BCM2708_PERI_BASE_DEFAULT;
+-            } else if (strcmp(hardware, "BCM2709") == 0 || strcmp(hardware, "BCM2836") == 0) {
+-                // pi 2 hardware
+-                peri_base = BCM2709_PERI_BASE_DEFAULT;
+-            } else if (strcmp(hardware, "BCM2710") == 0 || strcmp(hardware, "BCM2837") == 0) {
+-                // pi 3 hardware
+-                peri_base = BCM2710_PERI_BASE_DEFAULT;
+-            } else if (strcmp(hardware, "BCM2711") == 0) {
+-                // pi 4 hardware
+-                peri_base = BCM2711_PERI_BASE_DEFAULT;
+-            }
+-        }
+-        fclose(fp);
+-    }
+-
+-    if (!peri_base)
+-        return SETUP_NO_PERI_ADDR;
+-
+-    gpio_base = peri_base + GPIO_BASE_OFFSET;
+-
+-    // mmap the GPIO memory registers
+-    if ((mem_fd = open("/dev/mem", O_RDWR|O_SYNC) ) < 0)
+-        return SETUP_DEVMEM_FAIL;
+-
+-    if ((gpio_mem = malloc(BLOCK_SIZE + (PAGE_SIZE-1))) == NULL)
+-        return SETUP_MALLOC_FAIL;
+-
+-    if ((uint32_t)gpio_mem % PAGE_SIZE)
+-        gpio_mem += PAGE_SIZE - ((uint32_t)gpio_mem % PAGE_SIZE);
+-
+-    if ((gpio_map = (uint32_t *)mmap( (void *)gpio_mem, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, mem_fd, gpio_base)) == MAP_FAILED)
+-        return SETUP_MMAP_FAIL;
+-
+-    return SETUP_OK;
+ }
+ 
+-void clear_event_detect(int gpio)
+-{
+-    int offset = EVENT_DETECT_OFFSET + (gpio/32);
+-    int shift = (gpio%32);
+-
+-    *(gpio_map+offset) |= (1 << shift);
+-    short_wait();
+-    *(gpio_map+offset) = 0;
+-}
+-
+-int eventdetected(int gpio)
+-{
+-    int offset, value, bit;
+-
+-    offset = EVENT_DETECT_OFFSET + (gpio/32);
+-    bit = (1 << (gpio%32));
+-    value = *(gpio_map+offset) & bit;
+-    if (value)
+-        clear_event_detect(gpio);
+-    return value;
+-}
+-
+-void set_rising_event(int gpio, int enable)
+-{
+-    int offset = RISING_ED_OFFSET + (gpio/32);
+-    int shift = (gpio%32);
+-
+-    if (enable)
+-        *(gpio_map+offset) |= 1 << shift;
+-    else
+-        *(gpio_map+offset) &= ~(1 << shift);
+-    clear_event_detect(gpio);
+-}
+-
+-void set_falling_event(int gpio, int enable)
+-{
+-    int offset = FALLING_ED_OFFSET + (gpio/32);
+-    int shift = (gpio%32);
+-
+-    if (enable) {
+-        *(gpio_map+offset) |= (1 << shift);
+-        *(gpio_map+offset) = (1 << shift);
+-    } else {
+-        *(gpio_map+offset) &= ~(1 << shift);
+-    }
+-    clear_event_detect(gpio);
+-}
+-
+-void set_high_event(int gpio, int enable)
+-{
+-    int offset = HIGH_DETECT_OFFSET + (gpio/32);
+-    int shift = (gpio%32);
+-
+-    if (enable)
+-        *(gpio_map+offset) |= (1 << shift);
+-    else
+-        *(gpio_map+offset) &= ~(1 << shift);
+-    clear_event_detect(gpio);
+-}
+-
+-void set_low_event(int gpio, int enable)
+-{
+-    int offset = LOW_DETECT_OFFSET + (gpio/32);
+-    int shift = (gpio%32);
+-
+-    if (enable)
+-        *(gpio_map+offset) |= 1 << shift;
+-    else
+-        *(gpio_map+offset) &= ~(1 << shift);
+-    clear_event_detect(gpio);
+-}
+-
+-void set_pullupdn(int gpio, int pud)
+-{
+-    // Check GPIO register
+-    int is2711 = *(gpio_map+PULLUPDN_OFFSET_2711_3) != 0x6770696f;
+-    if (is2711) {
+-        // Pi 4 Pull-up/down method
+-        int pullreg = PULLUPDN_OFFSET_2711_0 + (gpio >> 4);
+-        int pullshift = (gpio & 0xf) << 1;
+-        unsigned int pullbits;
+-        unsigned int pull = 0;
+-        switch (pud) {
+-            case PUD_OFF:  pull = 0; break;
+-            case PUD_UP:   pull = 1; break;
+-            case PUD_DOWN: pull = 2; break;
+-            default:       pull = 0; // switch PUD to OFF for other values
+-        } 
+-        pullbits = *(gpio_map + pullreg);
+-        pullbits &= ~(3 << pullshift);
+-        pullbits |= (pull << pullshift);
+-        *(gpio_map + pullreg) = pullbits;
+-    } else {
+-        // Legacy Pull-up/down method
+-        int clk_offset = PULLUPDNCLK_OFFSET + (gpio/32);
+-        int shift = (gpio%32);
+-
+-        if (pud == PUD_DOWN) {
+-            *(gpio_map+PULLUPDN_OFFSET) = (*(gpio_map+PULLUPDN_OFFSET) & ~3) | PUD_DOWN;
+-        } else if (pud == PUD_UP) {
+-            *(gpio_map+PULLUPDN_OFFSET) = (*(gpio_map+PULLUPDN_OFFSET) & ~3) | PUD_UP;
+-        } else  { // pud == PUD_OFF
+-            *(gpio_map+PULLUPDN_OFFSET) &= ~3;
+-        }
+-        short_wait();
+-        *(gpio_map+clk_offset) = 1 << shift;
+-        short_wait();
+-        *(gpio_map+PULLUPDN_OFFSET) &= ~3;
+-        *(gpio_map+clk_offset) = 0;
+-    }
++void set_pullupdn(int gpio, int pud) {
++// for RPi5 Pull-up/down method
++	gpion[gpio].word=gpio_map[(GPIO_PADS_BANK0 + gpio*4+4)/4];
++	if (pud == PUD_DOWN) {
++		gpion[gpio].bit.PUE=0;
++		gpion[gpio].bit.PDE=1;
++	} else if (pud == PUD_UP) {
++		gpion[gpio].bit.PUE=1;
++		gpion[gpio].bit.PDE=0;
++	} else  { // pud == PUD_OFF
++		gpion[gpio].bit.PUE=0;
++		gpion[gpio].bit.PDE=0;
++	}
++	gpio_map[(GPIO_PADS_BANK0 + gpio*4+4)/4]=gpion[gpio].word;
+ }
+ 
+-//updated Eric PTAK - trouch.com
+-void set_function(int gpio, int function, int pud)
+-{
++void set_function(int gpio, int function, int pud) {
+ 	if (function == PWM) {
+ 		function = OUT;
+ 		enablePWM(gpio);
+@@ -311,57 +120,69 @@
+ 	else {
+ 		disablePWM(gpio);
+ 	}
+-
+-    int offset = FSEL_OFFSET + (gpio/10);
+-    int shift = (gpio%10)*3;
+-
+-    set_pullupdn(gpio, pud);
+-    if (function == OUT)
+-	*(gpio_map+offset) = (*(gpio_map+offset) & ~(7<<shift)) | (function<<shift);
+-    else  // function == IN
+-        *(gpio_map+offset) = (*(gpio_map+offset) & ~(7<<shift));
++	set_pullupdn(gpio, pud);
++// for RPi5
++	if (function == OUT) {
++		gpio_map[(GPIO_SYS_BANK0+0x4+0x2000)/4]=(1<<gpio);
++	} else { // function == IN
++		gpio_map[(GPIO_SYS_BANK0+0x4+0x3000)/4]=(1<<gpio);
++	}
++	gpion_ctrl[gpio].word=gpio_map[gpio*2+1];
++	gpion_ctrl[gpio].bit.FUNCSEL=5;
++	gpio_map[gpio*2+1]=gpion_ctrl[gpio].word;
++	gpion[gpio].word=gpio_map[(GPIO_PADS_BANK0 + gpio*4+4)/4];
++	if (function == OUT) {
++		gpion[gpio].bit.OD=0;
++		gpion[gpio].bit.IE=1;
++    	} else { // function == IN
++		gpion[gpio].bit.OD=1;
++		gpion[gpio].bit.IE=1;
++	}
++	gpio_map[(GPIO_PADS_BANK0 + gpio*4+4)/4]=gpion[gpio].word;
++	short_wait;
+ }
+ 
+-//added Eric PTAK - trouch.com
+-int get_function(int gpio)
+-{
+-   int offset = FSEL_OFFSET + (gpio/10);
+-   int shift = (gpio%10)*3;
+-   int value = *(gpio_map+offset);
+-   value >>= shift;
+-   value &= 7;
+-   if ((value == OUT) && isPWMEnabled(gpio)) {
+-	   value = PWM;
+-   }
+-   return value; // 0=input, 1=output, 4=alt0
+-}
+-
+-//updated Eric PTAK - trouch.com
+-int input(int gpio)
+-{
+-   int offset, value, mask;
+-
+-   offset = PINLEVEL_OFFSET + (gpio/32);
+-   mask = (1 << gpio%32);
+-   value = *(gpio_map+offset) & mask;
+-   return value;
+-}
+-
+-void output(int gpio, int value)
+-{
+-    int offset, shift;
+-    
+-    if (value) // value == HIGH
+-        offset = SET_OFFSET + (gpio/32);
+-    else       // value == LOW
+-        offset = CLR_OFFSET + (gpio/32);
+-    
+-    shift = (gpio%32);
++int get_function(int gpio) {
++// for RPi5
++	int value;
++	gpion_status[gpio].word=gpio_map[gpio*2];
++	int stat_value = gpion_status[gpio].word;
++	gpion_ctrl[gpio].word=gpio_map[gpio*2+1];
++	int ctrl_value = gpion_ctrl[gpio].word;
++	if  ((stat_value & 0x3000) == 0x3000) {
++		value = OUT;
++	} else if (((stat_value & 0x4400000) == 0x4400000) && (ctrl_value == 0x9f)) {
++		value = NONE;
++	} else {
++		value = IN;
++	}
++	if ((value == OUT) && isPWMEnabled(gpio)) {
++		value = PWM;
++	}
++	short_wait;
++	return value;
++}
+ 
+-    *(gpio_map+offset) = 1 << shift;
++int input(int gpio) {
++	uint32_t hilow;
++	hilow = gpio_map[(GPIO_SYS_BANK0+0x8)/4] & (1<<gpio);
++	return hilow ? 1 : 0;
++//	return value;
++//        if (value) // value == HIGH
++//                gpio_map[(GPIO_SYS_BANK0+0x2000)/4]=(1<<gpio);
++//        else       // value == LOW
++//                gpio_map[(GPIO_SYS_BANK0+0x3000)/4]=(1<<gpio);
++}
++
++void output(int gpio, int value) {
++// for RPi5
++	if (value == HIGH) { // value == HIGH
++		gpio_map[(GPIO_SYS_BANK0+0x2000)/4]=(1<<gpio);
++	} else {      // value == LOW
++		gpio_map[(GPIO_SYS_BANK0+0x3000)/4]=(1<<gpio);
++	}
+ }
+ 
+-//added Eric PTAK - trouch.com
+ void outputSequence(int gpio, int period, char* sequence) {
+ 	int i, value;
+ 	struct timespec ts;
+@@ -383,69 +204,56 @@
+ void resetPWM(int gpio) {
+ 	gpio_pulses[gpio].type = 0;
+ 	gpio_pulses[gpio].value = 0;
+-
+ 	gpio_tspairs[gpio].up.tv_sec = 0;
+ 	gpio_tspairs[gpio].up.tv_nsec = 0;
+ 	gpio_tspairs[gpio].down.tv_sec = 0;
+ 	gpio_tspairs[gpio].down.tv_nsec = 0;
+ }
+ 
+-//added Eric PTAK - trouch.com
+ void pulseTS(int gpio, struct timespec *up, struct timespec *down) {
+ 	if ((up->tv_sec > 0) || (up->tv_nsec > 0)) {
+ 		output(gpio, 1);
+ 		nanosleep(up, NULL);
+ 	}
+-
+ 	if ((down->tv_sec > 0) || (down->tv_nsec > 0)) {
+ 		output(gpio, 0);
+ 		nanosleep(down, NULL);
+ 	}
+ }
+ 
+-//added Eric PTAK - trouch.com
+ void pulseOrSaveTS(int gpio, struct timespec *up, struct timespec *down) {
+ 	if (gpio_threads[gpio] != NULL) {
+ 		memcpy(&gpio_tspairs[gpio].up, up, sizeof(struct timespec));
+ 		memcpy(&gpio_tspairs[gpio].down, down, sizeof(struct timespec));
+-	}
+-	else {
++	} else {
+ 		pulseTS(gpio, up, down);
+ 	}
+ }
+ 
+-//added Eric PTAK - trouch.com
+ void pulseMilli(int gpio, int up, int down) {
+ 	struct timespec tsUP, tsDOWN;
+-
+ 	tsUP.tv_sec = up/1000;
+ 	tsUP.tv_nsec = (up%1000) * 1000000;
+-
+ 	tsDOWN.tv_sec = down/1000;
+ 	tsDOWN.tv_nsec = (down%1000) * 1000000;
+ 	pulseOrSaveTS(gpio, &tsUP, &tsDOWN);
+ }
+ 
+-//added Eric PTAK - trouch.com
+ void pulseMilliRatio(int gpio, int width, float ratio) {
+ 	int up = ratio*width;
+ 	int down = width - up;
+ 	pulseMilli(gpio, up, down);
+ }
+ 
+-//added Eric PTAK - trouch.com
+ void pulseMicro(int gpio, int up, int down) {
+ 	struct timespec tsUP, tsDOWN;
+-
+ 	tsUP.tv_sec = 0;
+ 	tsUP.tv_nsec = up * 1000;
+-
+ 	tsDOWN.tv_sec = 0;
+ 	tsDOWN.tv_nsec = down * 1000;
+ 	pulseOrSaveTS(gpio, &tsUP, &tsDOWN);
+ }
+ 
+-//added Eric PTAK - trouch.com
+ void pulseMicroRatio(int gpio, int width, float ratio) {
+ 	int up = ratio*width;
+ 	int down = width - up;
+@@ -477,46 +285,38 @@
+ //added Eric PTAK - trouch.com
+ void* pwmLoop(void* data) {
+ 	int gpio = (int)data;
+-
+ 	while (1) {
+ 		pulseTS(gpio, &gpio_tspairs[gpio].up, &gpio_tspairs[gpio].down);
+ 	}
+ }
+ 
+-//added Eric PTAK - trouch.com
+ void enablePWM(int gpio) {
+ 	pthread_t *thread = gpio_threads[gpio];
+ 	if (thread != NULL) {
+ 		return;
+-	}
+-
++		}
+ 	resetPWM(gpio);
+-
+ 	thread = (pthread_t*) malloc(sizeof(pthread_t));
+ 	pthread_create(thread, NULL, pwmLoop, (void*)gpio);
+ 	gpio_threads[gpio] = thread;
+ }
+ 
+-//added Eric PTAK - trouch.com
+ void disablePWM(int gpio) {
+ 	pthread_t *thread = gpio_threads[gpio];
+ 	if (thread == NULL) {
+ 		return;
+ 	}
+-
+ 	pthread_cancel(*thread);
+ 	gpio_threads[gpio] = NULL;
+ 	output(gpio, 0);
+ 	resetPWM(gpio);
+ }
+ 
+-//added Eric PTAK - trouch.com
+ int isPWMEnabled(int gpio) {
+ 	return gpio_threads[gpio] != NULL;
+ }
+ 
+-
+-void cleanup(void)
+-{
+-    munmap((void *)gpio_map, BLOCK_SIZE);
++void cleanup(void) {
++// for raspi5
++        munmap((void *)gpio_map, BLOCK_SIZE);
+ }
+diff -urN WebIOPi-0.7.1/python/native/gpio.h WebIOPi-0.7.1next/python/native/gpio.h
+--- WebIOPi-0.7.1/python/native/gpio.h	2024-10-04 12:50:59.993477738 +0900
++++ WebIOPi-0.7.1next/python/native/gpio.h	2024-10-05 11:05:31.370313334 +0900
+@@ -38,6 +38,7 @@
+ #define ALT2	6
+ #define ALT3	7
+ #define PWM	8
++#define NONE	9
+ 
+ #define LOW	0
+ #define HIGH	1
+@@ -54,6 +55,83 @@
+ 	float value;
+ };
+ 
++typedef union{
++	uint32_t word;
++	struct{
++		uint32_t 			: 8;
++		uint32_t OUTFROMPERI		: 1;
++		uint32_t OUTTOPAD		: 1;
++		uint32_t 			: 2;
++		uint32_t OEFROMPERI		: 1;
++		uint32_t OETOPAD		: 1;
++		uint32_t 			: 2;
++		uint32_t INISDIRECT		: 1;
++		uint32_t INFROMPAD		: 1;
++		uint32_t INFILTERED		: 1;
++		uint32_t INTOPERI		: 1;
++		uint32_t EVENT_EDGE_LOW 	: 1;
++		uint32_t EVENT_EDGE_HIGH	: 1;
++		uint32_t EVENT_LEVEL_LOW 	: 1;
++		uint32_t EVENT_LEVEL_HIGH 	: 1;
++		uint32_t EVENT_F_EDGE_LOW 	: 1;
++		uint32_t EVENT_F_EDGE_HIGH 	: 1;
++		uint32_t EVENT_DB_LEVEL_LOW 	: 1;
++		uint32_t EVENT_DB_LEVEL_HIGH 	: 1;
++		uint32_t IRQCOMBINED		: 1;
++		uint32_t IRQTOPROC		: 1;
++		uint32_t 			: 2;
++	}bit;
++}GPIOn_STATUS;
++
++typedef union{
++	uint32_t word;
++	struct{
++		uint32_t FUNCSEL 		: 5;
++		uint32_t F_M			: 7;
++		uint32_t OUTOVER		: 2;
++		uint32_t OEOVER			: 2;
++		uint32_t INOVER			: 2;
++		uint32_t 			: 2;
++		uint32_t IRQMASK_EDGE_LOW 	: 1;
++		uint32_t IRQMASK_EDGE_HIGH 	: 1;
++		uint32_t IRQMASK_LEVEL_LOW 	: 1;
++		uint32_t IRQMASK_LEVEL_HIGH 	: 1;
++		uint32_t IRQMASK_F_EDGE_LOW 	: 1;
++		uint32_t IRQMASK_F_EDGE_HIGH 	: 1;
++		uint32_t IRQMASK_DB_LEVEL_LOW 	: 1;
++		uint32_t IRQMASK_DB_LEVEL_HIGH 	: 1;
++		uint32_t IRQRESET		: 1;
++		uint32_t 			: 1;
++		uint32_t IRQOVER		: 2;
++	}bit;
++}GPIOn_CTRL;
++
++typedef union{
++	uint32_t word;
++}INTR;
++
++typedef union{
++	uint32_t word;
++	struct{
++		uint32_t VOLTAGE	: 1;
++		uint32_t 		: 31;
++	}bit;
++}VOLTAGE_SELECT;
++
++typedef union{
++	uint32_t word;
++	struct{
++		uint32_t SLEWFAST	: 1;
++		uint32_t SCHMITT	: 1;
++		uint32_t PDE		: 1;
++		uint32_t PUE		: 1;
++		uint32_t DRIVE		: 2;
++		uint32_t IE		: 1;
++		uint32_t OD		: 1;
++		uint32_t 		: 24;
++	}bit;
++}GPIOn;
++
+ int setup(void);
+ void set_function(int gpio, int function, int pud);
+ int get_function(int gpio);
+diff -urN WebIOPi-0.7.1/python/webiopi/utils/version.py WebIOPi-0.7.1next/python/webiopi/utils/version.py
+--- WebIOPi-0.7.1/python/webiopi/utils/version.py	2024-10-04 12:51:00.001480547 +0900
++++ WebIOPi-0.7.1next/python/webiopi/utils/version.py	2024-10-05 18:48:46.351573249 +0900
+@@ -1,7 +1,7 @@
+ import re
+ import sys
+ 
+-VERSION         = '0.7.1a'
++VERSION         = '0.7.1a_rp5'
+ VERSION_STRING  = "WebIOPi/%s/Python%d.%d" % (VERSION, sys.version_info.major, sys.version_info.minor)
+ PYTHON_MAJOR    = sys.version_info.major
+ BOARD_REVISION  = 0
