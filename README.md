@@ -26,6 +26,10 @@ WebIOPiのオリジナルは既に開発が停止しているため、最新のR
 * パッチを実行します。  
 `$ patch -p1 < ../pn-webiopi/WebIOPi-RPiALL.patch`
 
+* Raspberry Pi 5でwebiopiを利用する場合はRaspi5用のパッチを追加で適用します。(注：Raspi5以外に適用すると動きません)
+
+  `$ patch -p1 < ../pn-webiopi/Webiopi_RPi5.patch`
+
 * セットアップを実行します。  
 `$ sudo ./setup.sh`  
 
@@ -38,9 +42,9 @@ WebIOPiのオリジナルは既に開発が停止しているため、最新のR
 ## RPI_INFO()を追加しています。
 RPI_INFO()を利用することで実行中のRaspberry Piの情報を取得することが可能です。
 webiopi.GPIO.RPI_INFOを実行することでJSON形式のデータが取得できます。
-取得できる情報は以下の通りです（以下はRaspberry Pi A+にて実行したときの情報です）
+取得できる情報は以下の通りです（以下はRaspberry Pi 5にて実行したときの情報です）
 
-{'P1_REVISION': 3, 'REVISION': '900021', 'TYPE': 'Model A+', 'MANUFACTURER': 'Sony UK', 'PROCESSOR': 'BCM2835', 'RAM': '512M'}
+{'P1_REVISION': 3, 'REVISION': 'c04170', 'TYPE': 'Raspberry Pi 5 Model B', 'MANUFACTURER': 'Sony UK', 'PROCESSOR': 'BCM2712', 'BREV': '1.0', 'RAM': '4G'}
 
 # REST APIについて
 ## rpi_infoで情報を取得できます。
@@ -48,7 +52,8 @@ webiopi.GPIO.RPI_INFOを実行することでJSON形式のデータが取得で�
 {"P1_REVISION": 3, "REVISION": "a020d3", "TYPE": "Raspberry Pi 3 Model B+", "MANUFACTURER": "Sony UK", "PROCESSOR": "BCM2837", "RAM": "1G"}
 
 # WebIOPi Main Menuに実行中のラズパイ情報が表示されます  
-![RPi400_Webiopi](https://user-images.githubusercontent.com/24805847/133913690-328702ca-47f3-4fe4-a5bd-a3a6745290a3.png)
+![webiopi_rp5_top](https://github.com/user-attachments/assets/57177ced-7ae8-4707-b7d8-111af6fc177e)
 # I2C/SPI/UART/1wireなど設定することで表示変わります（UART/1wireは再起動が必要）  
-![webiopi](https://user-images.githubusercontent.com/24805847/121349278-49fa8700-c964-11eb-971c-88f845703fb5.png)
+![webiopi_rp5](https://github.com/user-attachments/assets/16f56f98-139c-4fbb-abc2-826460b656ba)
+
 
