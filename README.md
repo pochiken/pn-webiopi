@@ -26,7 +26,7 @@ WebIOPiのオリジナルは既に開発が停止しているため、最新のR
 * パッチを実行します。  
 `$ patch -p1 < ../pn-webiopi/WebIOPi-RPiALL.patch`
 
-* Raspberry Pi 5でwebiopiを利用する場合はRaspi5用のパッチを追加で適用します。(注：Raspi5以外に適用すると動きません)
+* Raspberry Pi 5/500でwebiopiを利用する場合はRaspi5用のパッチを追加で適用します。(注：Raspi5/500以外に適用すると動きません)
 
   `$ patch -p1 < ../pn-webiopi/Webiopi_RPi5.patch`
 
