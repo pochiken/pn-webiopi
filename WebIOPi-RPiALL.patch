@@ -1,6 +1,6 @@
-diff -urN WebIOPi-0.7.1org/htdocs/index.html WebIOPi-0.7.1/htdocs/index.html
---- WebIOPi-0.7.1org/htdocs/index.html	2014-02-03 02:55:16.000000000 +0900
-+++ WebIOPi-0.7.1/htdocs/index.html	2023-11-20 13:20:52.748514349 +0900
+diff -urN WebIOPi-0.7.1/htdocs/index.html WebIOPi-0.7.1next/htdocs/index.html
+--- WebIOPi-0.7.1/htdocs/index.html	2014-02-03 02:55:16.000000000 +0900
++++ WebIOPi-0.7.1next/htdocs/index.html	2024-12-18 14:04:18.698044594 +0900
 @@ -4,10 +4,18 @@
  	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
  	<meta name="viewport" content = "width = 420, user-scalable = no" /> 
@@ -20,9 +20,9 @@ diff -urN WebIOPi-0.7.1org/htdocs/index.html WebIOPi-0.7.1/htdocs/index.html
  
  <h2><a href="/app/gpio-header">GPIO Header</a></h2>
  <p>Control and Debug the Raspberry Pi GPIO with a display which looks like the physical header.</p>
-diff -urN WebIOPi-0.7.1org/htdocs/webiopi.css WebIOPi-0.7.1/htdocs/webiopi.css
---- WebIOPi-0.7.1org/htdocs/webiopi.css	2014-02-01 05:02:27.000000000 +0900
-+++ WebIOPi-0.7.1/htdocs/webiopi.css	2023-11-20 13:20:52.758514546 +0900
+diff -urN WebIOPi-0.7.1/htdocs/webiopi.css WebIOPi-0.7.1next/htdocs/webiopi.css
+--- WebIOPi-0.7.1/htdocs/webiopi.css	2014-02-01 05:02:27.000000000 +0900
++++ WebIOPi-0.7.1next/htdocs/webiopi.css	2024-12-18 14:04:18.698044594 +0900
 @@ -28,7 +28,7 @@
  }
  
@@ -69,9 +69,9 @@ diff -urN WebIOPi-0.7.1org/htdocs/webiopi.css WebIOPi-0.7.1/htdocs/webiopi.css
  }
  
  .FunctionBasic {
-diff -urN WebIOPi-0.7.1org/htdocs/webiopi.js WebIOPi-0.7.1/htdocs/webiopi.js
---- WebIOPi-0.7.1org/htdocs/webiopi.js	2014-02-24 01:37:07.000000000 +0900
-+++ WebIOPi-0.7.1/htdocs/webiopi.js	2023-11-20 13:20:52.768514742 +0900
+diff -urN WebIOPi-0.7.1/htdocs/webiopi.js WebIOPi-0.7.1next/htdocs/webiopi.js
+--- WebIOPi-0.7.1/htdocs/webiopi.js	2014-02-24 01:37:07.000000000 +0900
++++ WebIOPi-0.7.1next/htdocs/webiopi.js	2024-12-18 14:04:19.086027848 +0900
 @@ -1,1518 +1,1533 @@
 -/*
 -   Copyright 2012-2013 Eric Ptak - trouch.com
@@ -3124,9 +3124,9 @@ diff -urN WebIOPi-0.7.1org/htdocs/webiopi.js WebIOPi-0.7.1/htdocs/webiopi.js
 +		setTimeout(function(){temp.refreshUI()}, temp.refreshTime);
 +	});
 +}
-diff -urN WebIOPi-0.7.1org/python/native/bridge.c WebIOPi-0.7.1/python/native/bridge.c
---- WebIOPi-0.7.1org/python/native/bridge.c	2013-03-17 21:56:40.000000000 +0900
-+++ WebIOPi-0.7.1/python/native/bridge.c	2023-11-20 13:20:52.768514742 +0900
+diff -urN WebIOPi-0.7.1/python/native/bridge.c WebIOPi-0.7.1next/python/native/bridge.c
+--- WebIOPi-0.7.1/python/native/bridge.c	2013-03-17 21:56:40.000000000 +0900
++++ WebIOPi-0.7.1next/python/native/bridge.c	2024-12-18 14:04:19.086027848 +0900
 @@ -28,6 +28,8 @@
  static PyObject *_InvalidDirectionException;
  static PyObject *_InvalidChannelException;
@@ -3188,9 +3188,9 @@ diff -urN WebIOPi-0.7.1org/python/native/bridge.c WebIOPi-0.7.1/python/native/br
  
  	if (Py_AtExit(cleanup) != 0)
  	{
-diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.c WebIOPi-0.7.1/python/native/cpuinfo.c
---- WebIOPi-0.7.1org/python/native/cpuinfo.c	2012-10-29 06:26:10.000000000 +0900
-+++ WebIOPi-0.7.1/python/native/cpuinfo.c	2023-11-20 13:20:52.768514742 +0900
+diff -urN WebIOPi-0.7.1/python/native/cpuinfo.c WebIOPi-0.7.1next/python/native/cpuinfo.c
+--- WebIOPi-0.7.1/python/native/cpuinfo.c	2012-10-29 06:26:10.000000000 +0900
++++ WebIOPi-0.7.1next/python/native/cpuinfo.c	2024-12-18 14:02:45.750052591 +0900
 @@ -1,5 +1,5 @@
  /*
 -Copyright (c) 2012 Ben Croston
@@ -3198,7 +3198,7 @@ diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.c WebIOPi-0.7.1/python/native/c
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of
  this software and associated documentation files (the "Software"), to deal in
-@@ -20,46 +20,299 @@
+@@ -20,46 +20,302 @@
  SOFTWARE.
  */
  
@@ -3325,9 +3325,12 @@ diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.c WebIOPi-0.7.1/python/native/c
 +               case '1': info->type = "Raspberry Pi 4 Model B"; info->p1_revision = 3; break;
 +               case '2': info->type = "Raspberry Pi Zero 2 W"; info->p1_revision = 4; break;
 +               case '3': info->type = "Raspberry Pi 400"; info->p1_revision = 3; break;
-+               case '4': info->type = "Compute Mudule 4"; info->p1_revision = 0; break;
-+               case '5': info->type = "Compute Mudule 4S"; info->p1_revision = 0; break;
++               case '4': info->type = "Compute Module 4"; info->p1_revision = 0; break;
++               case '5': info->type = "Compute Module 4S"; info->p1_revision = 0; break;
 +               case '7': info->type = "Raspberry Pi 5 Model B"; info->p1_revision = 3; break;
++               case '8': info->type = "Compute Module 5"; info->p1_revision = 0; break;
++               case '9': info->type = "Raspberry Pi 500"; info->p1_revision = 3; break;
++               case 'a': info->type = "Compute Module 5 Lite"; info->p1_revision = 0; break;
 +               default : info->type = "Unknown"; info->p1_revision = 3; break;
 +            } break;
 +         default: info->type = "Unknown"; info->p1_revision = 3; break;
@@ -3526,9 +3529,9 @@ diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.c WebIOPi-0.7.1/python/native/c
 +V revision (0-15)
 +
 +*/
-diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.h WebIOPi-0.7.1/python/native/cpuinfo.h
---- WebIOPi-0.7.1org/python/native/cpuinfo.h	2012-10-29 06:26:10.000000000 +0900
-+++ WebIOPi-0.7.1/python/native/cpuinfo.h	2023-11-20 13:20:52.778514938 +0900
+diff -urN WebIOPi-0.7.1/python/native/cpuinfo.h WebIOPi-0.7.1next/python/native/cpuinfo.h
+--- WebIOPi-0.7.1/python/native/cpuinfo.h	2012-10-29 06:26:10.000000000 +0900
++++ WebIOPi-0.7.1next/python/native/cpuinfo.h	2024-12-18 14:04:19.282019389 +0900
 @@ -1,5 +1,5 @@
  /*
 -Copyright (c) 2012 Ben Croston
@@ -3557,9 +3560,9 @@ diff -urN WebIOPi-0.7.1org/python/native/cpuinfo.h WebIOPi-0.7.1/python/native/c
 +
 +int get_rpi_info(rpi_info *info);
 +rpi_info rpiinfo;
-diff -urN WebIOPi-0.7.1org/python/native/gpio.c WebIOPi-0.7.1/python/native/gpio.c
---- WebIOPi-0.7.1org/python/native/gpio.c	2013-02-04 07:04:18.000000000 +0900
-+++ WebIOPi-0.7.1/python/native/gpio.c	2023-11-20 13:20:52.778514938 +0900
+diff -urN WebIOPi-0.7.1/python/native/gpio.c WebIOPi-0.7.1next/python/native/gpio.c
+--- WebIOPi-0.7.1/python/native/gpio.c	2013-02-04 07:04:18.000000000 +0900
++++ WebIOPi-0.7.1next/python/native/gpio.c	2024-12-18 14:04:19.378015246 +0900
 @@ -1,5 +1,5 @@
  /*
 -Copyright (c) 2012 Ben Croston / 2012-2013 Eric PTAK
@@ -3895,9 +3898,9 @@ diff -urN WebIOPi-0.7.1org/python/native/gpio.c WebIOPi-0.7.1/python/native/gpio
 -    munmap((caddr_t)gpio_map, BLOCK_SIZE);
 +    munmap((void *)gpio_map, BLOCK_SIZE);
  }
-diff -urN WebIOPi-0.7.1org/python/native/gpio.h WebIOPi-0.7.1/python/native/gpio.h
---- WebIOPi-0.7.1org/python/native/gpio.h	2013-02-04 07:04:18.000000000 +0900
-+++ WebIOPi-0.7.1/python/native/gpio.h	2023-11-20 13:20:52.778514938 +0900
+diff -urN WebIOPi-0.7.1/python/native/gpio.h WebIOPi-0.7.1next/python/native/gpio.h
+--- WebIOPi-0.7.1/python/native/gpio.h	2013-02-04 07:04:18.000000000 +0900
++++ WebIOPi-0.7.1next/python/native/gpio.h	2024-12-18 14:04:19.474011103 +0900
 @@ -20,24 +20,26 @@
  SOFTWARE.
  */
@@ -3947,9 +3950,9 @@ diff -urN WebIOPi-0.7.1org/python/native/gpio.h WebIOPi-0.7.1/python/native/gpio
  void outputSequence(int gpio, int period, char* sequence);
  struct pulse* getPulse(int gpio);
  void pulseMilli(int gpio, int up, int down);
-diff -urN WebIOPi-0.7.1org/python/setup.py WebIOPi-0.7.1/python/setup.py
---- WebIOPi-0.7.1org/python/setup.py	2015-02-05 05:21:44.000000000 +0900
-+++ WebIOPi-0.7.1/python/setup.py	2023-11-19 21:51:23.307374987 +0900
+diff -urN WebIOPi-0.7.1/python/setup.py WebIOPi-0.7.1next/python/setup.py
+--- WebIOPi-0.7.1/python/setup.py	2015-02-05 05:21:44.000000000 +0900
++++ WebIOPi-0.7.1next/python/setup.py	2024-12-18 14:04:19.570006960 +0900
 @@ -33,5 +33,6 @@
                            "webiopi.devices.sensor",
                            "webiopi.devices.shield"
@@ -3958,9 +3961,9 @@ diff -urN WebIOPi-0.7.1org/python/setup.py WebIOPi-0.7.1/python/setup.py
 +      ext_modules      = [Extension('_webiopi.GPIO', ['native/bridge.c', 'native/gpio.c', 'native/cpuinfo.c'],
 +                       extra_compile_args = ["-fcommon"])],
        )
-diff -urN WebIOPi-0.7.1org/python/webiopi/devices/bus.py WebIOPi-0.7.1/python/webiopi/devices/bus.py
---- WebIOPi-0.7.1org/python/webiopi/devices/bus.py	2013-04-18 06:41:06.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/devices/bus.py	2023-11-20 13:20:52.778514938 +0900
+diff -urN WebIOPi-0.7.1/python/webiopi/devices/bus.py WebIOPi-0.7.1next/python/webiopi/devices/bus.py
+--- WebIOPi-0.7.1/python/webiopi/devices/bus.py	2013-04-18 06:41:06.000000000 +0900
++++ WebIOPi-0.7.1next/python/webiopi/devices/bus.py	2024-12-18 14:04:19.666002817 +0900
 @@ -15,12 +15,18 @@
  import os
  import time
@@ -3982,9 +3985,9 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/devices/bus.py WebIOPi-0.7.1/python/we
      "UART": {"enabled": False, "gpio": {14:"TX", 15:"RX"}},
      "ONEWIRE": {"enabled": False, "gpio": {4:"DATA"}, "modules": ["w1-gpio"], "wait": 2}
  }
-diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/http.py WebIOPi-0.7.1/python/webiopi/protocols/http.py
---- WebIOPi-0.7.1org/python/webiopi/protocols/http.py	2014-02-22 07:31:18.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/protocols/http.py	2023-11-20 13:20:52.778514938 +0900
+diff -urN WebIOPi-0.7.1/python/webiopi/protocols/http.py WebIOPi-0.7.1next/python/webiopi/protocols/http.py
+--- WebIOPi-0.7.1/python/webiopi/protocols/http.py	2014-02-22 07:31:18.000000000 +0900
++++ WebIOPi-0.7.1next/python/webiopi/protocols/http.py	2024-12-18 14:04:19.757998846 +0900
 @@ -194,13 +194,23 @@
          
          (contentType, encoding) = mime.guess_type(path)
@@ -4013,9 +4016,9 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/http.py WebIOPi-0.7.1/python
          self.logRequest(200)
          
      def processRequest(self):
-diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/rest.py WebIOPi-0.7.1/python/webiopi/protocols/rest.py
---- WebIOPi-0.7.1org/python/webiopi/protocols/rest.py	2013-04-18 06:41:06.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/protocols/rest.py	2023-11-20 13:20:52.778514938 +0900
+diff -urN WebIOPi-0.7.1/python/webiopi/protocols/rest.py WebIOPi-0.7.1next/python/webiopi/protocols/rest.py
+--- WebIOPi-0.7.1/python/webiopi/protocols/rest.py	2013-04-18 06:41:06.000000000 +0900
++++ WebIOPi-0.7.1next/python/webiopi/protocols/rest.py	2024-12-18 14:04:19.853994703 +0900
 @@ -161,6 +161,12 @@
              revision = "%s" % BOARD_REVISION
              return (200, revision, M_PLAIN)
@@ -4029,9 +4032,9 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/protocols/rest.py WebIOPi-0.7.1/python
          # Single GPIO getter
          elif relativePath.startswith("GPIO/"):
              return self.callDeviceFunction("GET", relativePath)
-diff -urN WebIOPi-0.7.1org/python/webiopi/utils/thread.py WebIOPi-0.7.1/python/webiopi/utils/thread.py
---- WebIOPi-0.7.1org/python/webiopi/utils/thread.py	2013-04-18 06:41:06.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/utils/thread.py	2023-11-20 13:20:52.778514938 +0900
+diff -urN WebIOPi-0.7.1/python/webiopi/utils/thread.py WebIOPi-0.7.1next/python/webiopi/utils/thread.py
+--- WebIOPi-0.7.1/python/webiopi/utils/thread.py	2013-04-18 06:41:06.000000000 +0900
++++ WebIOPi-0.7.1next/python/webiopi/utils/thread.py	2024-12-18 14:04:19.949990560 +0900
 @@ -33,14 +33,14 @@
              task.stop()
                  
@@ -4049,9 +4052,9 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/utils/thread.py WebIOPi-0.7.1/python/w
              TASKS.append(Task(func, True))
          else:
              while RUNNING:
-diff -urN WebIOPi-0.7.1org/python/webiopi/utils/version.py WebIOPi-0.7.1/python/webiopi/utils/version.py
---- WebIOPi-0.7.1org/python/webiopi/utils/version.py	2015-02-05 05:21:44.000000000 +0900
-+++ WebIOPi-0.7.1/python/webiopi/utils/version.py	2023-11-20 13:20:52.778514938 +0900
+diff -urN WebIOPi-0.7.1/python/webiopi/utils/version.py WebIOPi-0.7.1next/python/webiopi/utils/version.py
+--- WebIOPi-0.7.1/python/webiopi/utils/version.py	2015-02-05 05:21:44.000000000 +0900
++++ WebIOPi-0.7.1next/python/webiopi/utils/version.py	2024-12-18 14:04:20.005988143 +0900
 @@ -1,14 +1,15 @@
  import re
  import sys
@@ -4086,9 +4089,9 @@ diff -urN WebIOPi-0.7.1org/python/webiopi/utils/version.py WebIOPi-0.7.1/python/
  except:
      pass
  
-diff -urN WebIOPi-0.7.1org/setup.sh WebIOPi-0.7.1/setup.sh
---- WebIOPi-0.7.1org/setup.sh	2015-02-05 05:21:44.000000000 +0900
-+++ WebIOPi-0.7.1/setup.sh	2023-11-20 13:20:52.788515135 +0900
+diff -urN WebIOPi-0.7.1/setup.sh WebIOPi-0.7.1next/setup.sh
+--- WebIOPi-0.7.1/setup.sh	2015-02-05 05:21:44.000000000 +0900
++++ WebIOPi-0.7.1next/setup.sh	2024-12-18 14:04:20.029987107 +0900
 @@ -79,6 +79,14 @@
  echo "Copying HTML resources..."
  mkdir /usr/share/webiopi 2>/dev/null 1>/dev/null
